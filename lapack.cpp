@@ -1,202 +1,188 @@
 /**
  * Support for LAPACKE, C binding to the Linear Algebra PACKage by Netlib group
  * originally written in Fortran 77.
+ *
+ * TODO: Not all of the routines are here and we need to check that they work.
  */
 
 #include "lux/lux.hpp"
-#include "lapacke.hpp"
+#include <complex>
+
+template <class real> using complex = std::complex<real>;
+
+#define lapack_complex_double complex<double>
+#define lapack_complex_float complex<float>
+#define lapack_logical bool
+#define lapack_int int
+#define LAPACK_COMPLEX_CUSTOM
+
+#include <lapacke.h>
+
+// MODULE ENTRY POINT /////////////////////////////////////////////////////////
+
+#define REG(reg) {#reg, lux_cast(LAPACKE_##reg)},
 
 extern "C" int luaopen_lapack(lua_State *state)
 {
 	luaL_Reg regs[] =
 	{
-		// SINGLE PRECISION FLOAT
-
-		#define s(reg) {"s" #reg, lux_cast(reg<float>)},
+		/** SINGLE PRECISION FLOAT **/
 	
 		// LINEAR EQUATIONS
-		s(gesv)
-		s(gbsv)
-		s(gtsv)
-		s(posv)
-		s(ppsv)
-		s(pbsv)
-		s(ptsv)
-		s(sysv)
-		s(spsv)
+		REG(sgesv)
+		REG(sgbsv)
+		REG(sgtsv)
+		REG(sposv)
+		REG(sppsv)
+		REG(spbsv)
+		REG(sptsv)
+		REG(ssysv)
+		REG(sspsv)
 		// LINEAR LEAST SQUARES
-		s(gels)
-		s(gelsy)
-		s(gelss)
-		s(gelsd) 
+		REG(sgels)
+		REG(sgelsy)
+		REG(sgelss)
+		REG(sgelsd) 
 		// GENERALIZED LINEAR LEAST SQUARES
-		s(gglse)
-		s(ggglm)
+		REG(sgglse)
+		REG(sggglm)
 		// EIGENVALUES AND SINGULAR VALUES
-		s(gees)
-		s(geev)
-		s(gesvd)
-		s(syev)
-		s(spev)
-		s(sbev)
-		s(stev)
+		REG(sgees)
+		REG(sgeev)
+		REG(sgesvd)
+		REG(ssyev)
+		REG(sspev)
+		REG(ssbev)
+		REG(sstev)
 		// GENERALIZED EIGENVALUES AND SINGULAR VALUES
-		s(gges)
-		s(ggev)
-		s(ggsvd)
-		s(sygv)
-		s(spgv)
-		s(sbgv)
+		REG(sgges)
+		REG(sggev)
+		REG(sggsvd)
+		REG(ssygv)
+		REG(sspgv)
+		REG(ssbgv)
 		// COMPUTATIONAL ROUTINES FOR LINEAR EQUATIONS
-		s(getrf)
-		s(getrf)
+		REG(sgetrf)
+		REG(sgetrf)
 	
-		// DOUBLE PRECISION FLOAT
-
-		#define d(reg) {"d" #reg, lux_cast(reg<double>)},
+		/** DOUBLE PRECISION FLOAT **/
 	
 		// LINEAR EQUATIONS
-		d(gesv)
-		d(gbsv)
-		d(gtsv)
-		d(posv)
-		d(ppsv)
-		d(pbsv)
-		d(ptsv)
-		d(sysv)
-		d(spsv)
+		REG(dgesv)
+		REG(dgbsv)
+		REG(dgtsv)
+		REG(dposv)
+		REG(dppsv)
+		REG(dpbsv)
+		REG(dptsv)
+		REG(dsysv)
+		REG(dspsv)
 		// LINEAR LEAST SQUARES
-		d(gels)
-		d(gelsy)
-		d(gelss)
-		d(gelsd)
+		REG(dgels)
+		REG(dgelsy)
+		REG(dgelss)
+		REG(dgelsd)
 		// GENERALISED LINEAR LEAST SQUARES
-		d(gglse)
-		d(ggglm)
+		REG(dgglse)
+		REG(dggglm)
 		// EIGENVALUES AND SINGULAR VALUES
-		d(gees)
-		d(geev)
-		d(gesvd)
-		d(syev)
-		d(spev)
-		d(sbev)
-		d(stev)
+		REG(dgees)
+		REG(dgeev)
+		REG(dgesvd)
+		REG(dsyev)
+		REG(dspev)
+		REG(dsbev)
+		REG(dstev)
 		// GENERALIZED EIGENVALUES AND SINGULAR VALUES
-		d(gges)
-		d(ggev)
-		d(ggsvd)
-		d(sygv)
-		d(spgv)
-		d(sbgv)
+		REG(dgges)
+		REG(dggev)
+		REG(dggsvd)
+		REG(dsygv)
+		REG(dspgv)
+		REG(dsbgv)
 		// COMPUTATIONAL ROUTINES FOR LINEAR EQUATIONS
-		d(getrf)
-		d(getrf)
+		REG(dgetrf)
+		REG(dgetrf)
 			
-		// SINGLE PRECISION COMPLEX
-
-		#define c(reg) {"c" #reg, lux_cast(reg<complex<float>>)},
+		/** SINGLE PRECISION COMPLEX **/
 	
 		// LINEAR EQUATIONS
-		c(gesv)
-		c(gbsv)
-		c(gtsv)
-		c(posv)
-		c(ppsv)
-		c(pbsv)
-//		c(ptsv)
-		{"cptsv", lux_cast((ptsv<complex<float>, float>))},
-		c(sysv)
-		c(spsv)
-		c(hesv)
-		c(hpsv)
+		REG(cgesv)
+		REG(cgbsv)
+		REG(cgtsv)
+		REG(cposv)
+		REG(cppsv)
+		REG(cpbsv)
+		REG(cptsv)
+		REG(csysv)
+		REG(cspsv)
+		REG(chesv)
+		REG(chpsv)
 		// LINEAR LEAST SQUARES
-		c(gels)
-//		c(gelsy)
-		{"cgelsy", lux_cast((gelsy<complex<float>, float>))},
-//		c(gelss)
-		{"cgelss", lux_cast((gelss<complex<float>, float>))},
-//		c(gelsd)
-		{"cgelsd", lux_cast((gelsd<complex<float>, float>))},
+		REG(cgels)
+		REG(cgelsy)
+		REG(cgelss)
+		REG(cgelsd)
 		// GENERALISED LINEAR LEAST SQUARES
-		c(gglse)
-		c(ggglm)
+		REG(cgglse)
+		REG(cggglm)
 		// EIGENVALUES AND SINGULAR VALUES
-		c(gees)
-		c(geev)
-		c(gesvd)
-//		c(heev)
-		{"cheev", lux_cast(heev<float>)},
-//		c(hpev)
-		{"chpev", lux_cast(hpev<float>)},
-//		c(hbev)
-		{"chbev", lux_cast(hbev<float>)},
+		REG(cgees)
+		REG(cgeev)
+		REG(cgesvd)
+		REG(cheev)
+		REG(chpev)
+		REG(chbev)
 		// GENERALIZED EIGENVALUES AND SINGULAR VALUES
-		c(gges)
-		c(ggev)
-//		c(ggsvd)
-		{"cggsvd", lux_cast((ggsvd<complex<float>, float>))},
-//		c(hegv)
-		{"chegv", lux_cast(hegv<float>)},
-//		c(hpgv)
-		{"chpgv", lux_cast(hpgv<float>)},
-//		c(hbgv)
-		{"chbgv", lux_cast(hbgv<float>)},
+		REG(cgges)
+		REG(cggev)
+		REG(cggsvd)
+		REG(chegv)
+		REG(chpgv)
+		REG(chbgv)
 		// COMPUTATIONAL ROUTINES FOR LINEAR EQUATIONS
-		c(getrf)
-		c(getrf)
+		REG(cgetrf)
+		REG(cgetrf)
 	
-		// DOUBLE PRECISION COPMLEX
-
-		#define z(reg) {"z" #reg, lux_cast((reg<complex<double>>))},
+		/** DOUBLE PRECISION COPMLEX **/
 	
 		// LINEAR EQUATIONS
-		z(gesv)
-		z(gbsv)
-		z(gtsv)
-		z(posv)
-		z(ppsv)
-		z(pbsv)
-//		z(ptsv)
-		{"cptsv", lux_cast((ptsv<complex<double>, double>))},
-		z(sysv)
-		z(spsv)
-		z(hesv)
-		z(hpsv)
+		REG(zgesv)
+		REG(zgbsv)
+		REG(zgtsv)
+		REG(zposv)
+		REG(zppsv)
+		REG(zpbsv)
+		REG(zptsv)
+		REG(zsysv)
+		REG(zspsv)
+		REG(zhesv)
+		REG(zhpsv)
 		// LINEAR LEAST SQUARES
-		z(gels)
-//		z(gelsy)
-		{"cgelsy", lux_cast((gelsy<complex<double>, double>))},
-//		z(gelss)
-		{"cgelss", lux_cast((gelss<complex<double>, double>))},
-//		z(gelsd)
-		{"cgelsd", lux_cast((gelsd<complex<double>, double>))},
+		REG(zgels)
+		REG(zgelsy)
+		REG(zgelss)
+		REG(zgelsd)
 		// GENERALISED LINEAR LEAST SQUARES
-		z(gglse)
-		z(ggglm)
+		REG(zgglse)
+		REG(zggglm)
 		// EIGENVALUES AND SINGULAR VALUES
-		z(gees)
-		z(geev)
-		z(gesvd)
-//		z(heev)
-		{"cheev", lux_cast(heev<double>)},
-//		z(hpev)
-		{"chpev", lux_cast(hpev<double>)},
-//		z(hbev)
-		{"chbev", lux_cast(hbev<double>)},
+		REG(zgees)
+		REG(zgeev)
+		REG(zgesvd)
+		REG(zheev)
+		REG(zhpev)
+		REG(zhbev)
 		// GENERALIZED EIGENVALUES AND SINGULAR VALUES
-		z(gges)
-		z(ggev)
-//		z(ggsvd)
-		{"cggsvd", lux_cast((ggsvd<complex<double>, double>))},
-//		z(hegv)
-		{"chegv", lux_cast(hegv<double>)},
-//		z(hpgv)
-		{"chpgv", lux_cast(hpgv<double>)},
-//		z(hbgv)
-		{"chbgv", lux_cast(hbgv<double>)},
+		REG(zgges)
+		REG(zggev)
+		REG(zggsvd)
+		REG(zhegv)
+		REG(zhpgv)
+		REG(zhbgv)
 		// COMPUTATIONAL ROUTINES FOR LINEAR EQUATIONS
-		z(getrf)
-		z(getrf)
+		REG(zgetrf)
+		REG(zgetrf)
 		
 		// END
 			

@@ -3,197 +3,229 @@
  * written in Fortran 77. Linking to Intel's MKL should be transparent through
  * C into Lua. NVidia's CUDA implementation is stateful, however, and requires
  * extra wrapping.
+ *
+ * TODO: The BLAS header does not allow an alternate complex specification the
+ * way that LAPACK does, so the script needs to prefix complex arrays with the
+ * __unm operator for it to pass a void pointer. Otherwise we need to wrap all
+ * the complex BLAS functions by hand. My "blas.hpp" header mediates the issue
+ * but does not seem to be an optimal solution either.
  */
 
 #include "lux/lux.hpp"
-#include "cblas.hpp"
+#include <cblas.h>
+#include <complex>
 
+template <class real> using complex = std::complex<real>;
+
+// EXCEPTIONS /////////////////////////////////////////////////////////////////
+
+// SINGLE PRECISION COMPLEX
+
+static inline
+complex<float> cdotu(const int N, const complex<float> *X, const int incX, const complex<float> *Y, const int incY)
+{
+	complex<float> dotu;
+	cblas_cdotu_sub(N, X, incX, Y, incY, &dotu);
+	return dotu;
+}
+
+static inline
+complex<float> cdotc(const int N, const complex<float> *X, const int incX, const complex<float> *Y, const int incY)
+{
+	complex<float> dotc;
+	cblas_cdotc_sub(N, X, incX, Y, incY, &dotc);
+	return dotc;
+}
+
+// DOUBLE PRECISION COMPLEX
+
+static inline
+complex<double> zdotu(const int N, const complex<double> *X, const int incX, const complex<double> *Y, const int incY)
+{
+	complex<double> dotu;
+	cblas_zdotu_sub(N, X, incX, Y, incY, &dotu);
+	return dotu;
+}
+
+static inline
+complex<double> zdotc(const int N, const complex<double> *X, const int incX, const complex<double> *Y, const int incY)
+{
+	complex<double> dotc;
+	cblas_zdotc_sub(N, X, incX, Y, incY, &dotc);
+	return dotc;
+}
+
+// MODULE ENTRY POINT /////////////////////////////////////////////////////////
+
+#define REG(reg) {#reg, lux_cast(cblas_##reg)},
 
 extern "C" int luaopen_blas(lua_State *state)
 {
 	luaL_Reg regs[] =
 	{
 		// SINGLE PRECISION FLOAT
-
-		#define s(reg) {"s" #reg, lux_cast(reg<float>)},
 		
 		// LEVEL 1
-		s(dot)
-		s(nrm2)
-		s(asum)
-		s(iamax)
-		s(swap)
-		s(copy)
-		s(axpy)
-		s(rotg)
-		s(rotmg)
-		s(rot)
-		s(rotm)
-		s(scal)
+		REG(sdsdot)
+		REG(dsdot)
+		REG(sdot)
+		REG(snrm2)
+		REG(sasum)
+		REG(isamax)
+		REG(sswap)
+		REG(scopy)
+		REG(saxpy)
+		REG(srotg)
+		REG(srotmg)
+		REG(srot)
+		REG(srotm)
+		REG(sscal)
 		// LEVEL 2
-		s(gemv)
-		s(gbmv)
-		s(trmv)
-		s(tbmv)
-		s(tpmv)
-		s(trsv)
-		s(tbsv)
-		s(tpsv)
-		s(symv)
-		s(sbmv)
-		s(spmv)
-		s(ger)
-		s(syr)
-		s(spr)
-		s(syr2)
-		s(spr2)
+		REG(sgemv)
+		REG(sgbmv)
+		REG(strmv)
+		REG(stbmv)
+		REG(stpmv)
+		REG(strsv)
+		REG(stbsv)
+		REG(stpsv)
+		REG(ssymv)
+		REG(ssbmv)
+		REG(sspmv)
+		REG(sger)
+		REG(ssyr)
+		REG(sspr)
+		REG(ssyr2)
+		REG(sspr2)
 		// LEVEL 3
-		s(gemm)
-		s(symm)
-		s(syrk)
-		s(syr2k)
-		s(trmm)
-		s(trsm)
+		REG(sgemm)
+		REG(ssymm)
+		REG(ssyrk)
+		REG(ssyr2k)
+		REG(strmm)
+		REG(strsm)
 	
 		// DOUBLE PRECISION FLOAT
-
-		#define d(reg) {"d" #reg, lux_cast(reg<double>)},
 	
 		// LEVEL 1
-		d(dot)
-		d(nrm2)
-		d(asum)
-		d(iamax)
-		d(swap)
-		d(copy)
-		d(axpy)
-		d(rotg)
-		d(rotmg)
-		d(rot)
-		d(rotm)
-		d(scal)
+		REG(ddot)
+		REG(dnrm2)
+		REG(dasum)
+		REG(idamax)
+		REG(dswap)
+		REG(dcopy)
+		REG(daxpy)
+		REG(drotg)
+		REG(drotmg)
+		REG(drot)
+		REG(drotm)
+		REG(dscal)
 		// LEVEL 2
-		d(gemv)
-		d(gbmv)
-		d(trmv)
-		d(tbmv)
-		d(tpmv)
-		d(trsv)
-		d(tbsv)
-		d(tpsv)
-		d(symv)
-		d(sbmv)
-		d(spmv)
-		d(ger)
-		d(syr)
-		d(spr)
-		d(syr2)
-		d(spr2)
+		REG(dgemv)
+		REG(dgbmv)
+		REG(dtrmv)
+		REG(dtbmv)
+		REG(dtpmv)
+		REG(dtrsv)
+		REG(dtbsv)
+		REG(dtpsv)
+		REG(dsymv)
+		REG(dsbmv)
+		REG(dspmv)
+		REG(dger)
+		REG(dsyr)
+		REG(dspr)
+		REG(dsyr2)
+		REG(dspr2)
 		// LEVEL 3
-		d(gemm)
-		d(symm)
-		d(syrk)
-		d(syr2k)
-		d(trmm)
-		d(trsm)
+		REG(dgemm)
+		REG(dsymm)
+		REG(dsyrk)
+		REG(dsyr2k)
+		REG(dtrmm)
+		REG(dtrsm)
 	
 		// SINGLE PRECISION COMPLEX
 
-		#define c(reg) {"c" #reg, lux_cast(reg<complex<float>>)},
-
 		// LEVEL 1
-		c(dotu)
-		c(dotc)
-//		c(nrm2)
-		{"cnrm2", lux_cast((nrm2<complex<float>, float>))},
-//		c(asum)
-		{"casum", lux_cast((asum<complex<float>, float>))},
-		c(iamax)
-		c(swap)
-		c(copy)
-		c(axpy)
-		c(scal)
+		{"cdotu", lux_cast(cdotu)},
+		{"cdotc", lux_cast(cdotc)},
+		REG(scnrm2)
+		REG(scasum)
+		REG(icamax)
+		REG(cswap)
+		REG(ccopy)
+		REG(caxpy)
+		REG(cscal)
 		// LEVEL 2
-		c(gemv)
-		c(gbmv)
-		c(trmv)
-		c(tbmv)
-		c(tpmv)
-		c(trsv)
-		c(tbsv)
-		c(tpsv)
-		c(hemv)
-		c(hbmv)
-		c(hpmv)
-		c(geru)
-		c(gerc)
-//		c(her)
-		{"cher", lux_cast(her<float>)},
-//		c(hpr)
-		{"chpr", lux_cast(hpr<float>)},
-		c(her2)
-		c(hpr2)
+		REG(cgemv)
+		REG(cgbmv)
+		REG(ctrmv)
+		REG(ctbmv)
+		REG(ctpmv)
+		REG(ctrsv)
+		REG(ctbsv)
+		REG(ctpsv)
+		REG(chemv)
+		REG(chbmv)
+		REG(chpmv)
+		REG(cgeru)
+		REG(cgerc)
+		REG(cher)
+		REG(chpr)
+		REG(cher2)
+		REG(chpr2)
 		// LEVEL 3
-		c(gemm)
-		c(symm)
-		c(hemm)
-		c(syrk)
-//		c(herk)
-		{"cherk", lux_cast(herk<float>)},
-		c(syr2k)
-//		c(her2k)
-		{"cher2k", lux_cast(her2k<float>)},
-		c(trmm)
-		c(trsm)
+		REG(cgemm)
+		REG(csymm)
+		REG(chemm)
+		REG(csyrk)
+		REG(cherk)
+		REG(csyr2k)
+		REG(cher2k)
+		REG(ctrmm)
+		REG(ctrsm)
 	
 		// DOUBLE PRECISION COMPLEX
-	
-		#define z(reg) {"z" #reg, lux_cast(reg<complex<double>>)},
 
 		// LEVEL 1
-		z(dotu)
-		z(dotc)
-//		z(nrm2)
-		{"znrm2", lux_cast((nrm2<complex<double>, double>))},
-//		z(asum)
-		{"zasum", lux_cast((asum<complex<double>, double>))},
-		z(iamax)
-		z(swap)
-		z(copy)
-		z(axpy)
-		z(scal)
+		{"zdotu", lux_cast(zdotu)},
+		{"zdotc", lux_cast(zdotc)},
+		REG(dznrm2)
+		REG(dzasum)
+		REG(izamax)
+		REG(zswap)
+		REG(zcopy)
+		REG(zaxpy)
+		REG(zscal)
 		// LEVEL 2
-		z(gemv)
-		z(gbmv)
-		z(trmv)
-		z(tbmv)
-		z(tpmv)
-		z(trsv)
-		z(tbsv)
-		z(tpsv)
-		z(hemv)
-		z(hbmv)
-		z(hpmv)
-		z(geru)
-		z(gerc)
-//		z(her)
-		{"zher", lux_cast(her<double>)},
-//		z(hpr)
-		{"zhpr", lux_cast(hpr<double>)},
-		z(her2)
-		z(hpr2)
+		REG(zgemv)
+		REG(zgbmv)
+		REG(ztrmv)
+		REG(ztbmv)
+		REG(ztpmv)
+		REG(ztrsv)
+		REG(ztbsv)
+		REG(ztpsv)
+		REG(zhemv)
+		REG(zhbmv)
+		REG(zhpmv)
+		REG(zgeru)
+		REG(zgerc)
+		REG(zher)
+		REG(zhpr)
+		REG(zher2)
+		REG(zhpr2)
 		// LEVEL 3
-		z(gemm)
-		z(symm)
-		z(hemm)
-		z(syrk)
-//		z(herk)
-		{"zherk", lux_cast(herk<double>)},
-		z(syr2k)
-//		z(her2k)
-		{"zher2k", lux_cast(her2k<double>)},
-		z(trmm)
-		z(trsm)
+		REG(zgemm)
+		REG(zsymm)
+		REG(zhemm)
+		REG(zsyrk)
+		REG(zherk)
+		REG(zsyr2k)
+		REG(zher2k)
+		REG(ztrmm)
+		REG(ztrsm)
 		
 		// END
 		
