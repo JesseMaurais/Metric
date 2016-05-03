@@ -1,0 +1,9 @@
+This is a collection of modules that bind BLAS and LAPACK, originally written
+in Fortran 77, to the Lua language, through C++ using the Lux emitter. It was
+originally part of Lux but now exists as a separate project. Once the binding
+is done for these linear algebra routines I will likely add support for other
+computational/numeric routines such as FFT, random number generators, as well
+as support for many common probability distributions and statistical methods,
+like ANOVA, regression, GLS, and Monte Carlo methods. I may also fold another
+project in to this one. My SDL2_lua project on GitHub would serve as a decent
+starting point to add interactive graphics and visualizations to this project
