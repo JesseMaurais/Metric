@@ -1,14 +1,19 @@
+/**
+ * Support for LAPACKE, C binding to the Linear Algebra PACKage by Netlib group
+ * originally written in Fortran 77.
+ */
+
 #include "lux/lux.hpp"
 #include "lapacke.hpp"
 
 extern "C" int luaopen_lapack(lua_State *state)
 {
-	// SINGLE PRECISION FLOAT
-
-	#define s(reg) {#reg, lux_cast(reg<float>)},
-	
-	luaL_Reg sreg [] =
+	luaL_Reg regs[] =
 	{
+		// SINGLE PRECISION FLOAT
+
+		#define s(reg) {"s" #reg, lux_cast(reg<float>)},
+	
 		// LINEAR EQUATIONS
 		s(gesv)
 		s(gbsv)
@@ -45,16 +50,11 @@ extern "C" int luaopen_lapack(lua_State *state)
 		// COMPUTATIONAL ROUTINES FOR LINEAR EQUATIONS
 		s(getrf)
 		s(getrf)
-		// END 
-		{nullptr}
-	};
 	
-	// DOUBLE PRECISION FLOAT
+		// DOUBLE PRECISION FLOAT
 
-	#define d(reg) {#reg, lux_cast(reg<double>)},
+		#define d(reg) {"d" #reg, lux_cast(reg<double>)},
 	
-	luaL_Reg dreg [] =
-	{
 		// LINEAR EQUATIONS
 		d(gesv)
 		d(gbsv)
@@ -91,16 +91,11 @@ extern "C" int luaopen_lapack(lua_State *state)
 		// COMPUTATIONAL ROUTINES FOR LINEAR EQUATIONS
 		d(getrf)
 		d(getrf)
-		// END
-		{nullptr}
-	};
-	
-	// SINGLE PRECISION COMPLEX
+			
+		// SINGLE PRECISION COMPLEX
 
-	#define c(reg) {#reg, lux_cast(reg<complex<float>>)},
+		#define c(reg) {"c" #reg, lux_cast(reg<complex<float>>)},
 	
-	luaL_Reg creg [] =
-	{
 		// LINEAR EQUATIONS
 		c(gesv)
 		c(gbsv)
@@ -109,7 +104,7 @@ extern "C" int luaopen_lapack(lua_State *state)
 		c(ppsv)
 		c(pbsv)
 //		c(ptsv)
-		{"ptsv", lux_cast((ptsv<complex<float>, float>))},
+		{"cptsv", lux_cast((ptsv<complex<float>, float>))},
 		c(sysv)
 		c(spsv)
 		c(hesv)
@@ -117,11 +112,11 @@ extern "C" int luaopen_lapack(lua_State *state)
 		// LINEAR LEAST SQUARES
 		c(gels)
 //		c(gelsy)
-		{"gelsy", lux_cast((gelsy<complex<float>, float>))},
+		{"cgelsy", lux_cast((gelsy<complex<float>, float>))},
 //		c(gelss)
-		{"gelss", lux_cast((gelss<complex<float>, float>))},
+		{"cgelss", lux_cast((gelss<complex<float>, float>))},
 //		c(gelsd)
-		{"gelsd", lux_cast((gelsd<complex<float>, float>))},
+		{"cgelsd", lux_cast((gelsd<complex<float>, float>))},
 		// GENERALISED LINEAR LEAST SQUARES
 		c(gglse)
 		c(ggglm)
@@ -130,35 +125,30 @@ extern "C" int luaopen_lapack(lua_State *state)
 		c(geev)
 		c(gesvd)
 //		c(heev)
-		{"heev", lux_cast(heev<float>)},
+		{"cheev", lux_cast(heev<float>)},
 //		c(hpev)
-		{"hpev", lux_cast(hpev<float>)},
+		{"chpev", lux_cast(hpev<float>)},
 //		c(hbev)
-		{"hbev", lux_cast(hbev<float>)},
+		{"chbev", lux_cast(hbev<float>)},
 		// GENERALIZED EIGENVALUES AND SINGULAR VALUES
 		c(gges)
 		c(ggev)
 //		c(ggsvd)
-		{"ggsvd", lux_cast((ggsvd<complex<float>, float>))},
+		{"cggsvd", lux_cast((ggsvd<complex<float>, float>))},
 //		c(hegv)
-		{"hegv", lux_cast(hegv<float>)},
+		{"chegv", lux_cast(hegv<float>)},
 //		c(hpgv)
-		{"hpgv", lux_cast(hpgv<float>)},
+		{"chpgv", lux_cast(hpgv<float>)},
 //		c(hbgv)
-		{"hbgv", lux_cast(hbgv<float>)},
+		{"chbgv", lux_cast(hbgv<float>)},
 		// COMPUTATIONAL ROUTINES FOR LINEAR EQUATIONS
 		c(getrf)
 		c(getrf)
-		// END		
-		{nullptr}
-	};
 	
-	// DOUBLE PRECISION COPMLEX
+		// DOUBLE PRECISION COPMLEX
 
-	#define z(reg) {#reg, lux_cast((reg<complex<double>>))},
+		#define z(reg) {"z" #reg, lux_cast((reg<complex<double>>))},
 	
-	luaL_Reg zreg [] =
-	{
 		// LINEAR EQUATIONS
 		z(gesv)
 		z(gbsv)
@@ -167,7 +157,7 @@ extern "C" int luaopen_lapack(lua_State *state)
 		z(ppsv)
 		z(pbsv)
 //		z(ptsv)
-		{"ptsv", lux_cast((ptsv<complex<double>, double>))},
+		{"cptsv", lux_cast((ptsv<complex<double>, double>))},
 		z(sysv)
 		z(spsv)
 		z(hesv)
@@ -175,11 +165,11 @@ extern "C" int luaopen_lapack(lua_State *state)
 		// LINEAR LEAST SQUARES
 		z(gels)
 //		z(gelsy)
-		{"gelsy", lux_cast((gelsy<complex<double>, double>))},
+		{"cgelsy", lux_cast((gelsy<complex<double>, double>))},
 //		z(gelss)
-		{"gelss", lux_cast((gelss<complex<double>, double>))},
+		{"cgelss", lux_cast((gelss<complex<double>, double>))},
 //		z(gelsd)
-		{"gelsd", lux_cast((gelsd<complex<double>, double>))},
+		{"cgelsd", lux_cast((gelsd<complex<double>, double>))},
 		// GENERALISED LINEAR LEAST SQUARES
 		z(gglse)
 		z(ggglm)
@@ -188,61 +178,31 @@ extern "C" int luaopen_lapack(lua_State *state)
 		z(geev)
 		z(gesvd)
 //		z(heev)
-		{"heev", lux_cast(heev<double>)},
+		{"cheev", lux_cast(heev<double>)},
 //		z(hpev)
-		{"hpev", lux_cast(hpev<double>)},
+		{"chpev", lux_cast(hpev<double>)},
 //		z(hbev)
-		{"hbev", lux_cast(hbev<double>)},
+		{"chbev", lux_cast(hbev<double>)},
 		// GENERALIZED EIGENVALUES AND SINGULAR VALUES
 		z(gges)
 		z(ggev)
 //		z(ggsvd)
-		{"ggsvd", lux_cast((ggsvd<complex<double>, double>))},
+		{"cggsvd", lux_cast((ggsvd<complex<double>, double>))},
 //		z(hegv)
-		{"hegv", lux_cast(hegv<double>)},
+		{"chegv", lux_cast(hegv<double>)},
 //		z(hpgv)
-		{"hpgv", lux_cast(hpgv<double>)},
+		{"chpgv", lux_cast(hpgv<double>)},
 //		z(hbgv)
-		{"hbgv", lux_cast(hbgv<double>)},
+		{"chbgv", lux_cast(hbgv<double>)},
 		// COMPUTATIONAL ROUTINES FOR LINEAR EQUATIONS
 		z(getrf)
 		z(getrf)
-		// END		
+		
+		// END
+			
 		{nullptr}
 	};
-	
-	// Register functions in extant global metatables
-	
-	if (luaL_getmetatable(state, "float"))
-	{
-		luaL_setfuncs(state, sreg, 0);
-		if (luaL_getsubtable(state, -1, "complex"))
-		{
-			luaL_setfuncs(state, creg, 0);
-			lua_pop(state, 2);
-		}
-		else
-		 return luaL_error(state, "require'complex' for float");
-	}
-	else
-	 return luaL_error(state, "require'array' for float");
-	 
-	if (luaL_getmetatable(state, "double"))
-	{
-		luaL_setfuncs(state, dreg, 0);
-		if (luaL_getsubtable(state, -1, "complex"))
-		{
-			luaL_setfuncs(state, zreg, 0);
-			lua_pop(state, 2);
-		}
-		else
-		 return luaL_error(state, "require'complex' for double");
-	}
-	else
-	 return luaL_error(state, "require'array' for double");
-	
-	// Done
-
-	return 0;
+	luaL_newlib(state, regs);
+	return 1;
 }
 
