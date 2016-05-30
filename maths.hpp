@@ -1,7 +1,25 @@
+#include <algorithm>
 #include <utility>
 #include <cmath>
 
-namespace maths {
+namespace maths
+{
+	// numeric
+
+	template <typename int_t> inline int_t gcd(int_t m, int_t n)
+	{
+		if (n < m) std::swap(m, n);
+		int_t r;
+		while (m) r = n % m, n = m, m = r;
+		return n;
+	}
+
+	template <typename int_t> inline int_t lcm(int_t m, int_t n)
+	{
+		return (m * n) / gcd(m, n);
+	}
+
+	// combinatorial
 
 	template <typename int_t> inline int_t fact(int_t n)
 	{
@@ -12,6 +30,7 @@ namespace maths {
 
 	template <typename int_t> inline int_t perm(int_t n, int_t k)
 	{
+		if (n < k) std::swap(n, k);
 		int_t m = n;
 		k = n - k;
 		while (--k) --n, m *= n;
@@ -20,44 +39,15 @@ namespace maths {
 
 	template <typename int_t> inline int_t comb(int_t n, int_t k)
 	{
-		int_t r = n - k;
-		if (r < k) std::swap(k, r);
-		// k < r and n = k + r
+		if (n < k) std::swap(n, k);
+		k = std::min(k, n - k);
 		int_t m = n;
-		int_t d = k;
-		while (--k) --n, m *= n, d *= k;
-		return m/d;
+		int_t r = k;
+		while (--k) --n, m *= n, r *= k;
+		return m/r;
 	}
 
-	template <typename int_t> inline int_t gcd(int_t m, int_t n)
-	{
-		if (n < m) std::swap(m, n);
-		// m < n
-		int_t r;
-		while (n) r = n % m, n = m, n = r;
-		return m;
-	}
-
-	template <typename int_t> inline int_t lcm(int_t m, int_t n)
-	{
-		return (m * n) / gcd(m, n);
-	}
-
-	// scale significand using base exponent
-
-	template <typename float_t> inline float_t scalbn(float_t x, int n)
-	{
-		return std::scalbn(x, n);
-	}
-
-	// power functions
-
-	template <typename float_t> inline float_t hypot(float_t x, float_t y)
-	{
-		return std::hypot(x, y);
-	}
-
-	// standard error functions
+	// error & complement
 
 	template <typename float_t> inline float_t erf(float_t x)
 	{
@@ -69,9 +59,9 @@ namespace maths {
 		return std::erfc(x);
 	}
 
-	// gamma & log-gamma functions
+	// gamma & log-gamma
 
-	template <typename float_t> inline float_t gamma(float_t x)
+	template <typename float_t> inline float_t tgamma(float_t x)
 	{
 		return std::tgamma(x);
 	}
@@ -81,11 +71,16 @@ namespace maths {
 		return std::lgamma(x);
 	}
 
-	// lossless float multiply and add
+	// lossless linear & hypotenuse
 
 	template <typename float_t> inline float_t fma(float_t x, float_t y, float_t z)
 	{
 		return std::fma(x, y, z);
+	}
+
+	template <typename float_t> inline float_t hypot(float_t x, float_t y)
+	{
+		return std::hypot(x, y);
 	}
 
 }; // namespace maths
