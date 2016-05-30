@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-std=c++11
-OBJ=blas.so lapack.so
+OBJ=maths.so
 DIR=/usr/local/lib/lua/5.3/
 
 all: $(OBJ)
@@ -14,6 +14,9 @@ install:
 	
 uninstall:
 	rm $(addprefix $(DIR), $(OBJ))
+
+%.so: %.cpp %.hpp
+	$(CC) $(CFLAGS) -shared -o $@ -fpic $< -lm
 
 blas.so: blas.cpp cblas.hpp
 	$(CC) $(CFLAGS) -shared -o $@ -fpic $< -lblas

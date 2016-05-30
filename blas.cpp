@@ -37,6 +37,19 @@ complex<float> cdotc(const int N, const complex<float> *X, const int incX, const
 	return dotc;
 }
 
+static inline
+void cscal(const int N, const complex<float> alpha, complex<float> *X, const int incX)
+{
+	cblas_cscal(N, alpha, X, incX);
+}
+
+static inline
+void csscal(const int N, const float alpha, complex<float> *X, const int incX)
+{
+	cblas_csscal(N, alpha, X, incX);
+}
+
+
 // DOUBLE PRECISION COMPLEX
 
 static inline
@@ -53,6 +66,18 @@ complex<double> zdotc(const int N, const complex<double> *X, const int incX, con
 	complex<double> dotc;
 	cblas_zdotc_sub(N, X, incX, Y, incY, &dotc);
 	return dotc;
+}
+
+static inline
+void zscal(const int N, const complex<double> alpha, complex<double> *X, const int incX)
+{
+	cblas_cscal(N, alpha, X, incX);
+}
+
+static inline
+void zdscal(const int N, const double alpha, complex<double> *X, const int incX)
+{
+	cblas_csscal(N, alpha, X, incX);
 }
 
 // MODULE ENTRY POINT /////////////////////////////////////////////////////////
@@ -150,13 +175,14 @@ extern "C" int luaopen_blas(lua_State *state)
 		// LEVEL 1
 		{"cdotu", lux_cast(cdotu)},
 		{"cdotc", lux_cast(cdotc)},
+		{"cscal", lux_cast(cscal)},
+		{"csscal", lux_cast(csscal)},
 		REG(scnrm2)
 		REG(scasum)
 		REG(icamax)
 		REG(cswap)
 		REG(ccopy)
 		REG(caxpy)
-		REG(cscal)
 		// LEVEL 2
 		REG(cgemv)
 		REG(cgbmv)
@@ -191,13 +217,14 @@ extern "C" int luaopen_blas(lua_State *state)
 		// LEVEL 1
 		{"zdotu", lux_cast(zdotu)},
 		{"zdotc", lux_cast(zdotc)},
+		{"zscal", lux_cast(zscal)},
+		{"zdscal", lux_cast(zdscal)},
 		REG(dznrm2)
 		REG(dzasum)
 		REG(izamax)
 		REG(zswap)
 		REG(zcopy)
 		REG(zaxpy)
-		REG(zscal)
 		// LEVEL 2
 		REG(zgemv)
 		REG(zgbmv)
