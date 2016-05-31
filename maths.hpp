@@ -4,7 +4,7 @@
 
 namespace maths
 {
-	// numeric
+	// common factors
 
 	template <typename int_t> inline int_t gcd(int_t m, int_t n)
 	{
@@ -16,7 +16,7 @@ namespace maths
 
 	template <typename int_t> inline int_t lcm(int_t m, int_t n)
 	{
-		return (m * n) / gcd(m, n);
+		return m * (n / gcd(m, n));
 	}
 
 	// combinatorial
@@ -31,9 +31,9 @@ namespace maths
 	template <typename int_t> inline int_t perm(int_t n, int_t k)
 	{
 		if (n < k) std::swap(n, k);
-		int_t m = n;
 		k = n - k;
-		while (--k) --n, m *= n;
+		int_t m = 1;
+		while (k--) m *= n, --n;
 		return m;
 	}
 
@@ -41,9 +41,9 @@ namespace maths
 	{
 		if (n < k) std::swap(n, k);
 		k = std::min(k, n - k);
-		int_t m = n;
-		int_t r = k;
-		while (--k) --n, m *= n, r *= k;
+		int_t m = 1;
+		int_t r = 1;
+		while (k) m *= n, r *= k, --n, --k;
 		return m/r;
 	}
 
@@ -59,7 +59,7 @@ namespace maths
 		return std::erfc(x);
 	}
 
-	// gamma & log-gamma & beta functions
+	// gamma & log-gamma & beta
 
 	template <typename float_t> inline float_t tgamma(float_t x)
 	{

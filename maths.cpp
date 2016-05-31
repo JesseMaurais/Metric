@@ -6,7 +6,7 @@ extern "C" int luaopen_maths(lua_State *state)
 	using namespace maths;
 	luaL_Reg regs[] =
 	{
-	// numeric
+	// common factors
 	{"gcd", lux_cast(gcd<lua_Integer>)},
 	{"lcm", lux_cast(lcm<lua_Integer>)},
 	// combinatorial
@@ -23,6 +23,7 @@ extern "C" int luaopen_maths(lua_State *state)
 	// linear & hypotenuse
 	{"line", lux_cast(fma<lua_Number>)},
 	{"hyp", lux_cast(hypot<lua_Number>)},
+	// end
 	{nullptr}
 	};
 	luaL_newlib(state, regs);
