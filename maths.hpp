@@ -23,8 +23,8 @@ namespace maths
 
 	template <typename int_t> inline int_t fact(int_t n)
 	{
-		int_t m = n;
-		while (--n) m *= n;
+		int_t m = 1;
+		while (n--) m *= n;
 		return m;
 	}
 
