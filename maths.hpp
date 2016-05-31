@@ -59,7 +59,7 @@ namespace maths
 		return std::erfc(x);
 	}
 
-	// gamma & log-gamma
+	// gamma & log-gamma & beta functions
 
 	template <typename float_t> inline float_t tgamma(float_t x)
 	{
@@ -69,6 +69,11 @@ namespace maths
 	template <typename float_t> inline float_t lgamma(float_t x)
 	{
 		return std::lgamma(x);
+	}
+
+	template <typename float_t> inline float_t beta(float_t a, float_t b)
+	{
+		return tgamma(a + b)/tgamma(a)/tgamma(b);
 	}
 
 	// lossless linear & hypotenuse

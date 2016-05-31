@@ -16,9 +16,10 @@ extern "C" int luaopen_maths(lua_State *state)
 	// error & complement
 	{"erf", lux_cast(erf<lua_Number>)},
 	{"erfc", lux_cast(erfc<lua_Number>)},
-	// gamma & log-gamma
+	// gamma & log-gamma & beta
 	{"gamma", lux_cast(tgamma<lua_Number>)},
 	{"lngamma", lux_cast(lgamma<lua_Number>)},
+	{"beta", lux_cast(beta<lua_Number>)},
 	// linear & hypotenuse
 	{"line", lux_cast(fma<lua_Number>)},
 	{"hyp", lux_cast(hypot<lua_Number>)},
