@@ -20,9 +20,35 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"gamma", lux_cast(tgamma<lua_Number>)},
 	{"lngamma", lux_cast(lgamma<lua_Number>)},
 	{"beta", lux_cast(beta<lua_Number>)},
-	// linear & hypotenuse
-	{"line", lux_cast(fma<lua_Number>)},
+	// power
+	{"pow", lux_cast(pow<lua_Number>)},
+	{"sqrt", lux_cast(sqrt<lua_Number>)},
+	{"cbrt", lux_cast(cbrt<lua_Number>)},
 	{"hyp", lux_cast(hypot<lua_Number>)},
+	// exponential
+	{"exp", lux_cast(exp<lua_Number>)},
+	{"exp2", lux_cast(exp<lua_Number>)},
+	{"ldexp", lux_cast(ldexp<lua_Number>)},
+	// logarithmic
+	{"ln", lux_cast(log<lua_Number>)},
+	{"log", lux_cast(log2<lua_Number>)},
+	{"log10", lux_cast(log10<lua_Number>)},
+	// trigonometric
+	{"sin", lux_cast(sin<lua_Number>)},
+	{"cos", lux_cast(cos<lua_Number>)},
+	{"tan", lux_cast(tan<lua_Number>)},
+	{"asin", lux_cast(asin<lua_Number>)},
+	{"acos", lux_cast(acos<lua_Number>)},
+	{"atan", lux_cast(atan<lua_Number>)},
+	{"atan2", lux_cast(atan2<lua_Number>)},
+	{"sinh", lux_cast(sinh<lua_Number>)},
+	{"cosh", lux_cast(cosh<lua_Number>)},
+	{"tanh", lux_cast(tanh<lua_Number>)},
+	{"asinh", lux_cast(asinh<lua_Number>)},
+	{"acosh", lux_cast(acosh<lua_Number>)},
+	{"atanh", lux_cast(atanh<lua_Number>)},
+	// lossless linear
+	{"line", lux_cast(fma<lua_Number>)},
 	// end
 	{nullptr}
 	};
