@@ -16,8 +16,10 @@ extern "C" int luaopen_maths(lua_State *state)
 	// error & complement
 	{"erf", lux_cast(erf<lua_Number>)},
 	{"erfc", lux_cast(erfc<lua_Number>)},
-	// gamma & log-gamma & beta
+	// gamma & beta
 	{"gamma", lux_cast(tgamma<lua_Number>)},
+	{"upgamma", lux_cast((upgamma<lua_Integer, lua_Number>))},
+	{"logamma", lux_cast((logamma<lua_Integer, lua_Number>))},
 	{"lngamma", lux_cast(lgamma<lua_Number>)},
 	{"beta", lux_cast(beta<lua_Number>)},
 	// power

@@ -63,7 +63,7 @@ namespace maths
 		return std::erfc(x);
 	}
 
-	// gamma & log-gamma & beta
+	// gamma & log-gamma & beta & incomplete-gamma
 
 	template <typename float_t> inline float_t tgamma(float_t x)
 	{
@@ -73,6 +73,22 @@ namespace maths
 	template <typename float_t> inline float_t lgamma(float_t x)
 	{
 		return std::lgamma(x);
+	}
+
+	template <typename int_t, typename float_t> inline float_t logamma(int_t a, float_t x)
+	{
+		float_t p = std::pow(x, a);
+		uintmax_t q = a, n = a, m;;
+		float_t s = 0, r = p/q;
+		do ++n, m = q, p *= x, q *= n, s += r, r = p/q;
+		while (m < q);
+		s /= std::exp(x);
+		return s;
+	}
+
+	template <typename int_t, typename float_t> inline float_t upgamma(int_t a, float_t x)
+	{
+		return tgamma(a) - logamma(a, x);
 	}
 
 	template <typename float_t> inline float_t beta(float_t a, float_t b)
