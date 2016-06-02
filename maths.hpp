@@ -131,7 +131,6 @@ namespace maths
 		return std::fma(x, y, z);
 	}
 
-
 	/// Euler's number raised to the exponent x
 	template <typename float_t> inline float_t exp(float_t x)
 	{
