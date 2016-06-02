@@ -18,8 +18,8 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"erfc", lux_cast(erfc<lua_Number>)},
 	// gamma & beta
 	{"gamma", lux_cast(tgamma<lua_Number>)},
-	{"upgamma", lux_cast((upgamma<lua_Integer, lua_Number>))},
-	{"logamma", lux_cast((logamma<lua_Integer, lua_Number>))},
+	{"igamma", lux_cast(igamma<lua_Number>)},
+	{"igammac", lux_cast(igammac<lua_Number>)},
 	{"lngamma", lux_cast(lgamma<lua_Number>)},
 	{"beta", lux_cast(beta<lua_Number>)},
 	// power

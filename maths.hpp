@@ -75,25 +75,23 @@ namespace maths
 		return std::lgamma(x);
 	}
 
-	template <typename int_t, typename float_t> inline float_t logamma(int_t a, float_t x)
+	template <typename float_t> inline float_t igammac(uintmax_t a, float_t x)
 	{
-		float_t p = std::pow(x, a);
-		uintmax_t q = a, n = a, m;;
-		float_t s = 0, r = p/q;
-		do ++n, m = q, p *= x, q *= n, s += r, r = p/q;
-		while (m < q);
+		float_t s = 0, t = std::pow(x, a)/a;
+		do ++a, s += t, t *= x, t /= a;
+		while (0 < t);
 		s /= std::exp(x);
 		return s;
 	}
 
-	template <typename int_t, typename float_t> inline float_t upgamma(int_t a, float_t x)
+	template <typename float_t> inline float_t igamma(uintmax_t a, float_t x)
 	{
-		return tgamma(a) - logamma(a, x);
+		return std::tgamma(a) - igammac(a, x);
 	}
 
 	template <typename float_t> inline float_t beta(float_t a, float_t b)
 	{
-		return tgamma(a + b)/tgamma(a)/tgamma(b);
+		return std::tgamma(a + b)/std::tgamma(a)/std::tgamma(b);
 	}
 
 	// power
