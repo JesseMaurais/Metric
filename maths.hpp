@@ -1,18 +1,9 @@
-/**
- * Function overloads are insufficient for emitting with Lux since the C++
- * compiler does not know which overload to use. Simply wrapping functions
- * in a template allows us to specify the type explicitly when wrapped. We
- * export most of the math functions of C++11 
- */
-
 #include <algorithm>
 #include <utility>
 #include <cmath>
 
 namespace maths
 {
-	// common factors
-
 	template <typename int_t> inline int_t gcd(int_t m, int_t n)
 	{
 		if (n < m) std::swap(m, n);
@@ -25,8 +16,6 @@ namespace maths
 	{
 		return m * (n / gcd(m, n));
 	}
-
-	// combinatorial
 
 	template <typename int_t> inline int_t fact(int_t n)
 	{
@@ -51,8 +40,6 @@ namespace maths
 		return m/r;
 	}
 
-	// error & complement
-
 	template <typename float_t> inline float_t erf(float_t x)
 	{
 		return std::erf(x);
@@ -62,9 +49,7 @@ namespace maths
 	{
 		return std::erfc(x);
 	}
-
-	// gamma & log-gamma & beta & incomplete-gamma
-
+	
 	template <typename float_t> inline float_t tgamma(float_t x)
 	{
 		return std::tgamma(x);
@@ -75,7 +60,7 @@ namespace maths
 		return std::lgamma(x);
 	}
 
-	template <typename float_t> inline float_t igammac(uintmax_t a, float_t x)
+	template <typename float_t> inline float_t igammac(float_t a, float_t x)
 	{
 		float_t s = 0, t = std::pow(x, a)/a;
 		do ++a, s += t, t *= x, t /= a;
@@ -84,18 +69,25 @@ namespace maths
 		return s;
 	}
 
-	template <typename float_t> inline float_t igamma(uintmax_t a, float_t x)
+	template <typename float_t> inline float_t igamma(float_t a, float_t x)
 	{
 		return std::tgamma(a) - igammac(a, x);
 	}
-
+	
 	template <typename float_t> inline float_t beta(float_t a, float_t b)
 	{
 		return std::tgamma(a + b)/std::tgamma(a)/std::tgamma(b);
 	}
-
-	// power
-
+	
+	template <typename float_t> inline float_t ibeta(float_t a, float_t b, float_t p)
+	{
+		float_t t = std::pow(p, a);
+		float_t s = 0, n = 1, u = 1 - b;
+		do s += t/a++, t *= u++, t /= n++, t *= p;
+		while (t != 0);
+		return s;
+	}
+	
 	template <typename float_t> inline float_t pow(float_t x, float_t exp)
 	{
 		return std::pow(x, exp);
@@ -115,9 +107,7 @@ namespace maths
 	{
 		return std::hypot(x, y);
 	}
-
-	// exponential
-
+	
 	template <typename float_t> inline float_t exp(float_t x)
 	{
 		return std::exp(x);
@@ -133,11 +123,14 @@ namespace maths
 		return std::ldexp(x, exp);
 	}
 
-	// logarithmic
-
 	template <typename float_t> inline float_t log(float_t x)
 	{
 		return std::log(x);
+	}
+
+	template <typename float_t> inline float_t logb(float_t x, float_t b)
+	{
+		return std::log(x)/std::log(b);
 	}
 
 	template <typename float_t> inline float_t log2(float_t x)
@@ -149,9 +142,7 @@ namespace maths
 	{
 		return std::log10(x);
 	}
-
-	// trigonometric
-
+	
 	template <typename float_t> inline float_t sin(float_t x)
 	{
 		return std::sin(x);
@@ -217,12 +208,11 @@ namespace maths
 		return std::atanh(x);
 	}
 
-	// lossless linear
-
 	template <typename float_t> inline float_t fma(float_t x, float_t y, float_t z)
 	{
 		return std::fma(x, y, z);
 	}
-
+	
 }; // namespace maths
 
+	

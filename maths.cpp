@@ -22,6 +22,7 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"igammac", lux_cast(igammac<lua_Number>)},
 	{"lngamma", lux_cast(lgamma<lua_Number>)},
 	{"beta", lux_cast(beta<lua_Number>)},
+	{"ibeta", lux_cast(ibeta<lua_Number>)},
 	// power
 	{"pow", lux_cast(pow<lua_Number>)},
 	{"sqrt", lux_cast(sqrt<lua_Number>)},
@@ -33,7 +34,8 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"ldexp", lux_cast(ldexp<lua_Number>)},
 	// logarithmic
 	{"ln", lux_cast(log<lua_Number>)},
-	{"log", lux_cast(log2<lua_Number>)},
+	{"log", lux_cast(logb<lua_Number>)},
+	{"log2", lux_cast(log2<lua_Number>)},
 	{"log10", lux_cast(log10<lua_Number>)},
 	// trigonometric
 	{"sin", lux_cast(sin<lua_Number>)},
@@ -43,6 +45,7 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"acos", lux_cast(acos<lua_Number>)},
 	{"atan", lux_cast(atan<lua_Number>)},
 	{"atan2", lux_cast(atan2<lua_Number>)},
+	// hyperbolic
 	{"sinh", lux_cast(sinh<lua_Number>)},
 	{"cosh", lux_cast(cosh<lua_Number>)},
 	{"tanh", lux_cast(tanh<lua_Number>)},
