@@ -79,7 +79,7 @@ namespace maths
 		return s;
 	}
 
-	/// The upper incomplete gamma function
+	/// The upper incomplete gamma function (lower's complement)
 	template <typename float_t> inline float_t igammac(float_t a, float_t x)
 	{
 		return std::tgamma(a) - igammac(a, x);
