@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-std=c++11
+CFLAGS=-std=c++14
 OBJ=maths.so stats.so
 DIR=/usr/local/lib/lua/5.3/
 

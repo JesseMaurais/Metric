@@ -13,17 +13,20 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"fact", lux_cast(fact<lua_Integer>)},
 	{"perm", lux_cast(perm<lua_Integer>)},
 	{"comb", lux_cast(comb<lua_Integer>)},
-	// error & complement
-	{"erf", lux_cast(erf<lua_Number>)},
-	{"erfc", lux_cast(erfc<lua_Number>)},
-	// gamma & beta
+	// gamma
 	{"gamma", lux_cast(tgamma<lua_Number>)},
 	{"igamma", lux_cast(igamma<lua_Number>)},
 	{"igammac", lux_cast(igammac<lua_Number>)},
 	{"lngamma", lux_cast(lgamma<lua_Number>)},
+	// beta
 	{"beta", lux_cast(beta<lua_Number>)},
 	{"ibeta", lux_cast(ibeta<lua_Number>)},
 	{"ibetac", lux_cast(ibetac<lua_Number>)},
+	// Reimann zeta
+	{"zeta", lux_cast(zeta<lua_Number>)},
+	// error & complement
+	{"erf", lux_cast(erf<lua_Number>)},
+	{"erfc", lux_cast(erfc<lua_Number>)},
 	// power
 	{"pow", lux_cast(pow<lua_Number>)},
 	{"sqrt", lux_cast(sqrt<lua_Number>)},
@@ -59,6 +62,24 @@ extern "C" int luaopen_maths(lua_State *state)
 	{nullptr}
 	};
 	luaL_newlib(state, regs);
+
+	lux_Reg<lua_Number> nums[] =
+	{
+	{"e", e},
+	{"ln2", ln2},
+	{"ln10", ln10},
+	{"log2e", log2e},
+	{"log10e", log10e},
+	{"pi", pi},
+	{"pi_2", pi_2},
+	{"pi_4", pi_4},
+	{"sqrt2pi", sqrt2pi},
+	{"sqrt2", sqrt2},
+	{"ngamma", ngamma},
+	{nullptr}
+	};
+	lux_settable(state, nums);
+
 	return 1;
 }
 

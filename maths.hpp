@@ -2,8 +2,22 @@
 #include <utility>
 #include <cmath>
 
+
 namespace maths
 {
+	// These are not always defined in cmath nor with 128 bit precision
+	constexpr auto e       = 2.718281828459045235360287471352662498L;
+	constexpr auto ln2     = 0.693147180559945309417232121458176568L;
+	constexpr auto ln10    = 2.302585092994045684017991454684364208L;
+	constexpr auto log2e   = 1.442695040888963407359924681001892137L;
+	constexpr auto log10e  = 0.434294481903251827651128918916605082L;
+	constexpr auto pi      = 3.141592653589793238462643383279502884L;
+	constexpr auto pi_2    = 1.570796326794896619231321691639751442L;
+	constexpr auto pi_4    = 0.785398163397448309615660845819875721L;
+	constexpr auto sqrt2pi = 2.506628274631000502415765284811045253L;
+	constexpr auto sqrt2   = 1.414213562373095048801688724209698079L;
+	constexpr auto ngamma  = 0.577215664901532860606512090082402431L;
+	
 	/// The greatest common divisor, so that m|gcd(m, n) and n|gcd(m, n)
 	template <typename int_t> int_t gcd(int_t m, int_t n)
 	{
@@ -44,20 +58,8 @@ namespace maths
 		while (k) m *= n--, r *= k--;
 		return m/r;
 	}
-
-	/// Measures the area for errors of size x under the bell curve
-	template <typename float_t> inline float_t erf(float_t x)
-	{
-		return std::erf(x);
-	}
-
-	/// Measures the complement of the error function
-	template <typename float_t> inline float_t erfc(float_t x)
-	{
-		return std::erfc(x);
-	}
 	
-	/// Extends factorials into the real numbers, gamma(n) = (n - 1)!
+	/// Extends factorials into the real numbers, tgamma(n) = (n - 1)!
 	template <typename float_t> inline float_t tgamma(float_t x)
 	{
 		return std::tgamma(x);
@@ -105,6 +107,27 @@ namespace maths
 	template <typename float_t> float_t ibetac(float_t a, float_t b, float_t p)
 	{
 		return beta(a, b) - ibeta(a, b, p);
+	}
+
+	/// The generalized Reimann zeta function for real x > 1
+	template <typename float_t> float_t zeta(float_t x, float_t a = 0, float_t eps = 1e-9)
+	{
+		float_t s = 0, t;
+		do t = 1.0/std::pow(++a, x), s += t;
+		while (eps < t);
+		return s;
+	}
+
+	/// Measures the area under the bell curve for errors of size x
+	template <typename float_t> inline float_t erf(float_t x)
+	{
+		return std::erf(x);
+	}
+
+	/// Measures the complement of the error function
+	template <typename float_t> inline float_t erfc(float_t x)
+	{
+		return std::erfc(x);
 	}
 	
 	/// The power of x raised to the exponent p
