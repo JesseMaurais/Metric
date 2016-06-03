@@ -5,7 +5,7 @@
 namespace maths
 {
 	/// The greatest common divisor, so that m|gcd(m, n) and n|gcd(m, n)
-	template <typename int_t> inline int_t gcd(int_t m, int_t n)
+	template <typename int_t> int_t gcd(int_t m, int_t n)
 	{
 		if (n < m) std::swap(m, n);
 		int_t r;
@@ -14,13 +14,13 @@ namespace maths
 	}
 
 	/// The lowest common multiple, so that gcd(m, n)*lcm(m, n) = m*n
-	template <typename int_t> inline int_t lcm(int_t m, int_t n)
+	template <typename int_t> int_t lcm(int_t m, int_t n)
 	{
 		return m * (n / gcd(m, n));
 	}
 
 	/// The factorial of n, n! = n(n - 1)(n - 2)...
-	template <typename int_t> inline int_t fact(int_t n)
+	template <typename int_t> int_t fact(int_t n)
 	{
 		int_t m = 1;
 		while (n) m *= n, --n;
@@ -28,7 +28,7 @@ namespace maths
 	}
 
 	/// The k permutations of n elements, n!/(n - k)!
-	template <typename int_t> inline int_t perm(int_t n, int_t k)
+	template <typename int_t> int_t perm(int_t n, int_t k)
 	{
 		k = n - k;
 		int_t m = 1;
@@ -37,7 +37,7 @@ namespace maths
 	}
 
 	/// The k combinations of n elements, n!/k!(n - k)!
-	template <typename int_t> inline int_t comb(int_t n, int_t k)
+	template <typename int_t> int_t comb(int_t n, int_t k)
 	{
 		k = std::min(k, n - k);
 		int_t m = 1, r = 1;
@@ -70,7 +70,7 @@ namespace maths
 	}
 
 	/// The lower incomplete gamma function
-	template <typename float_t> inline float_t igamma(float_t a, float_t x)
+	template <typename float_t> float_t igamma(float_t a, float_t x)
 	{
 		float_t s = 0, t = std::pow(x, a)/a;
 		do ++a, s += t, t *= x, t /= a;
@@ -80,25 +80,31 @@ namespace maths
 	}
 
 	/// The upper incomplete gamma function (lower's complement)
-	template <typename float_t> inline float_t igammac(float_t a, float_t x)
+	template <typename float_t> float_t igammac(float_t a, float_t x)
 	{
-		return std::tgamma(a) - igammac(a, x);
+		return std::tgamma(a) - igamma(a, x);
 	}
 	
 	/// Extends combinations into the field of real numbers
-	template <typename float_t> inline float_t beta(float_t a, float_t b)
+	template <typename float_t> float_t beta(float_t a, float_t b)
 	{
 		return std::tgamma(a + b)/std::tgamma(a)/std::tgamma(b);
 	}
 	
 	/// The lower incomplete beta function
-	template <typename float_t> inline float_t ibeta(float_t a, float_t b, float_t p)
+	template <typename float_t> float_t ibeta(float_t a, float_t b, float_t p)
 	{
 		float_t t = std::pow(p, a);
 		float_t s = 0, n = 1, u = 1 - b;
 		do s += t/a++, t *= u++, t /= n++, t *= p;
 		while (t != 0);
 		return s;
+	}
+
+	/// The upper incomplete beta function (lower's complement)
+	template <typename float_t> float_t ibetac(float_t a, float_t b, float_t p)
+	{
+		return beta(a, b) - ibeta(a, b, p);
 	}
 	
 	/// The power of x raised to the exponent p

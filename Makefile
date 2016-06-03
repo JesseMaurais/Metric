@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-std=c++11
-OBJ=maths.so
+OBJ=maths.so stats.so
 DIR=/usr/local/lib/lua/5.3/
 
 all: $(OBJ)

@@ -23,6 +23,7 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"lngamma", lux_cast(lgamma<lua_Number>)},
 	{"beta", lux_cast(beta<lua_Number>)},
 	{"ibeta", lux_cast(ibeta<lua_Number>)},
+	{"ibetac", lux_cast(ibetac<lua_Number>)},
 	// power
 	{"pow", lux_cast(pow<lua_Number>)},
 	{"sqrt", lux_cast(sqrt<lua_Number>)},
