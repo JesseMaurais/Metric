@@ -23,7 +23,7 @@ namespace maths
 	template <typename int_t> int_t fact(int_t n)
 	{
 		int_t m = 1;
-		while (n) m *= n, --n;
+		while (n) m *= n--;
 		return m;
 	}
 
@@ -32,7 +32,7 @@ namespace maths
 	{
 		k = n - k;
 		int_t m = 1;
-		while (k--) m *= n, --n;
+		while (k--) m *= n--;
 		return m;
 	}
 
@@ -41,7 +41,7 @@ namespace maths
 	{
 		k = std::min(k, n - k);
 		int_t m = 1, r = 1;
-		while (k) m *= n, r *= k, --n, --k;
+		while (k) m *= n--, r *= k--;
 		return m/r;
 	}
 
@@ -73,8 +73,8 @@ namespace maths
 	template <typename float_t> float_t igamma(float_t a, float_t x)
 	{
 		float_t s = 0, t = std::pow(x, a)/a;
-		do ++a, s += t, t *= x, t /= a;
-		while (0 < t);
+		do s += t, t *= x, t /= ++a;
+		while (t);
 		s /= std::exp(x);
 		return s;
 	}
@@ -97,7 +97,7 @@ namespace maths
 		float_t t = std::pow(p, a);
 		float_t s = 0, n = 1, u = 1 - b;
 		do s += t/a++, t *= u++, t /= n++, t *= p;
-		while (t != 0);
+		while (t);
 		return s;
 	}
 
