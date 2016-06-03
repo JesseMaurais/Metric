@@ -4,40 +4,32 @@ namespace stats
 {
 	// normal distribution
 
-	template <typename float_t> class norm
+	template <typename float_t>
+	float_t dnorm(float_t x, float_t mu=0, float_t sigma=1)
 	{
-		float_t mu, sigma, unit;
-		
-	 public:
-	 
-	 	norm(float_t mu=0, float_t sigma=1)
-	 	{
-	 	 	unit = maths::sqrt2pi*sigma;
-	 	 	this->sigma = sigma;
-	 		this->mu = mu;
-	 	}
-	 	
-	 	float_t pdf(float_t x)
-	 	{
-	 		float_t z = (x - mu)/sigma;
-	 		return maths::exp(-z*z/2)/unit;
-	 	}
-	 	
-	 	float_t cdf(float_t x)
-	 	{
-	 		float_t z = (x - mu)/sigma;
-	 		return (1 + maths::erf(z/maths::sqrt2))/2/sigma;
-	 	}
-	};
-
-	template <typename float_t> float_t dnorm(float_t x, float_t mu=0, float_t sigma=1)
-	{
-		return norm<float_t>(mu, sigma).pdf(x);
+		float_t z = (x -  mu)/sigma;
+		return maths::exp(-z*z/2)/maths::sqrt2pi/sigma;
 	}
 
-	template <typename float_t> float_t pnorm(float_t x, float_t mu=0, float_t sigma=1)
+	template <typename float_t>
+	float_t pnorm(float_t x, float_t mu=0, float_t sigma=1)
 	{
-		return norm<float_t>(mu, sigma).cdf(x);
+		float_t z = (x - mu)/sigma;
+		return (1 + maths::erf(z/maths::sqrt2))/2/sigma;
+	}
+
+	// gamma distribution
+
+	template <typename float_t>
+	float_t dgamma(float_t x, float_t a, float_t b)
+	{
+		return maths::pow(x*b, a)*maths::exp(-x*b)/maths::tgamma(a)/x;
+	}
+
+	template <typename float_t>
+	float_t pgamma(float_t x, float_t a, float_t b)
+	{
+		return maths::igamma(a, x*b)/maths::tgamma(a);
 	}
 
 }; // namespace stats
