@@ -14,6 +14,7 @@ namespace maths
 	constexpr auto pi      = 3.141592653589793238462643383279502884L;
 	constexpr auto pi_2    = 1.570796326794896619231321691639751442L;
 	constexpr auto pi_4    = 0.785398163397448309615660845819875721L;
+	constexpr auto pi2_6   = 1.644934066848226436472415166646025189L;
 	constexpr auto sqrt2pi = 2.506628274631000502415765284811045253L;
 	constexpr auto sqrt2   = 1.414213562373095048801688724209698079L;
 	constexpr auto ngamma  = 0.577215664901532860606512090082402431L;
@@ -39,6 +40,14 @@ namespace maths
 		int_t m = 1;
 		while (n) m *= n--;
 		return m;
+	}
+
+	/// The primorial of n, the product of primes up to n
+	template <typename int_t> int_t prim(int_t n)
+	{
+		int_t p = 1, q = 1;
+		while (q++ < n) if (gcd(p, q) < 2) p *= q;
+		return p;
 	}
 
 	/// The k permutations of n elements, n!/(n - k)!
@@ -110,10 +119,10 @@ namespace maths
 	}
 
 	/// The generalized Reimann zeta function for real x > 1
-	template <typename float_t> float_t zeta(float_t x, float_t a = 0, float_t eps = 1e-9)
+	template <typename float_t> float_t zeta(float_t x, float_t eps = 1e-9)
 	{
-		float_t s = 0, t;
-		do t = 1.0/std::pow(++a, x), s += t;
+		float_t r, s = 1, t, n = 1;
+		do r = std::pow(++n, x), t = 1/r, s += t;
 		while (eps < t);
 		return s;
 	}

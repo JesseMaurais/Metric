@@ -11,6 +11,7 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"lcm", lux_cast(lcm<lua_Integer>)},
 	// combinatorial
 	{"fact", lux_cast(fact<lua_Integer>)},
+	{"prim", lux_cast(prim<lua_Integer>)},
 	{"perm", lux_cast(perm<lua_Integer>)},
 	{"comb", lux_cast(comb<lua_Integer>)},
 	// gamma
@@ -73,6 +74,7 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"pi", pi},
 	{"pi_2", pi_2},
 	{"pi_4", pi_4},
+	{"pi2_6", pi2_6},
 	{"sqrt2pi", sqrt2pi},
 	{"sqrt2", sqrt2},
 	{"ngamma", ngamma},
