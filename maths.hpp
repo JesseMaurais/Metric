@@ -45,8 +45,12 @@ namespace maths
 	/// The primorial of n, the product of primes up to n
 	template <typename int_t> int_t prim(int_t n)
 	{
-		int_t p = 1, q = 1;
-		while (q++ < n) if (gcd(p, q) < 2) p *= q;
+		if (n < 2) return 1;
+		int_t p = 2, q = 3;
+		while (q <= n) {
+		 if (gcd(p, q) < 2) p *= q;
+		 q += 2;
+		};
 		return p;
 	}
 
