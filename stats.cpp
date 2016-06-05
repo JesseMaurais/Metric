@@ -22,6 +22,7 @@ extern "C" int luaopen_stats(lua_State *state)
 	{"dbeta", lux_cast(dbeta<lua_Number>)},
 	{"pbeta", lux_cast(pbeta<lua_Number>)},
 	// fisher
+	{"df", lux_cast(df<lua_Number>)},
 	{"pf", lux_cast(pf<lua_Number>)},
 	// end
 	{nullptr}

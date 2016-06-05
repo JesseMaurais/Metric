@@ -23,7 +23,8 @@ namespace stats
 	template <typename float_t> inline
 	float_t dgamma(float_t x, float_t a, float_t b)
 	{
-		return maths::pow(x*b, a)*maths::exp(-x*b)/maths::tgamma(a)/x;
+		float_t unity = maths::pow(b, a)/maths::tgamma(a);
+		return maths::pow(x, a - 1)*maths::exp(-x*b)*unity;
 	}
 
 	template <typename float_t> inline
@@ -51,13 +52,13 @@ namespace stats
 	template <typename float_t> inline
 	float_t dchisq(float_t x, float_t nu=1)
 	{
-		return dgamma(x, (float_t) 2, nu/2);
+		return dgamma(x, nu/2, 0.5);
 	}
 
 	template <typename float_t> inline
 	float_t pchisq(float_t x, float_t nu=1)
 	{
-		return pgamma(x, (float_t) 2, nu/2);
+		return pgamma(x, nu/2, 0.5);
 	}
 
 	// Beta distribution
@@ -71,15 +72,24 @@ namespace stats
 	template <typename float_t> inline
 	float_t pbeta(float_t x, float_t a, float_t b)
 	{
-		return maths::ibeta(x, a, b)/maths::beta(a, b);
+		return maths::ibeta(a, b, x)/maths::beta(a, b);
 	}
 
 	// Fisher distribution
 
 	template <typename float_t> inline
-	float_t pf(float_t x, float_t dfnum, float_t dfden)
+	float_t df(float_t x, float_t num, float_t den)
 	{
-		return pbeta(dfden/(dfden + dfnum*x), dfden/2, dfnum/2);
+		float_t y = x*num/den;
+		float_t p = maths::pow(y, num/2);
+		float_t q = maths::pow(1 + y, -(num + den)/2);
+		return p*q/maths::beta(num/2, den/2)/(x?x:1);
+	}
+
+	template <typename float_t> inline
+	float_t pf(float_t x, float_t num, float_t den)
+	{
+		return 1 - pbeta(num/(den + num*x), den/2, num/2);
 	}
 
 }; // namespace stats

@@ -103,7 +103,7 @@ namespace maths
 	/// Extends combinations into the field of real numbers
 	template <typename float_t> float_t beta(float_t a, float_t b)
 	{
-		return std::tgamma(a + b)/std::tgamma(a)/std::tgamma(b);
+		return std::tgamma(a)*std::tgamma(b)/std::tgamma(a + b);
 	}
 	
 	/// The lower incomplete beta function
