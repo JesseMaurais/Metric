@@ -32,5 +32,19 @@ namespace stats
 		return maths::igamma(a, x*b)/maths::tgamma(a);
 	}
 
+	// exponential distribution
+
+	template <typename float_t>
+	float_t dexp(float_t x, float_t mu=1)
+	{
+		return maths::exp(-x/mu)/mu;
+	}
+
+	template <typename float_t>
+	float_t pexp(float_t x, float_t mu=1)
+	{
+		return 1 - maths::exp(-x/mu);
+	}
+
 }; // namespace stats
 
