@@ -48,7 +48,7 @@ namespace maths
 		if (n < 2) return 1;
 		int_t p = 2, q = 3;
 		while (q <= n) {
-		 if (gcd(p, q) < 2) p *= q;
+		 if (gcd(p, q) == 1) p *= q;
 		 q += 2;
 		};
 		return p;
@@ -123,8 +123,23 @@ namespace maths
 	}
 
 	/// The generalized Reimann zeta function for real x > 1
-	template <typename float_t> float_t zeta(float_t x, float_t eps = 1e-9)
+	template <typename float_t> float_t zeta(float_t x, float_t eps=1e-9)
 	{
+		/* based on product of prime quotients (doesn't work)
+		float_t s, t, z = 1;
+		uintmax_t p = 2, q = 3;
+		do {
+		 if (gcd(p, q) == 1) {
+		  s = std::pow(q, x);
+		  t = s/(s - 1);
+		  z *= t;
+		  p *= q;
+		 }
+		 q += 2;
+		}
+		while (1 < t);
+		return z;
+		// */
 		float_t r, s = 1, t, n = 1;
 		do r = std::pow(++n, x), t = 1/r, s += t;
 		while (eps < t);
