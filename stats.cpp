@@ -15,6 +15,14 @@ extern "C" int luaopen_stats(lua_State *state)
 	// exponential
 	{"dexp", lux_cast(dexp<lua_Number>)},
 	{"pexp", lux_cast(pexp<lua_Number>)},
+	// chi-squared
+	{"dchisq", lux_cast(dchisq<lua_Number>)},
+	{"pchisq", lux_cast(pchisq<lua_Number>)},
+	// beta
+	{"dbeta", lux_cast(dbeta<lua_Number>)},
+	{"pbeta", lux_cast(pbeta<lua_Number>)},
+	// fisher
+	{"pf", lux_cast(pf<lua_Number>)},
 	// end
 	{nullptr}
 	};

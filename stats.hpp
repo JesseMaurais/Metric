@@ -51,13 +51,13 @@ namespace stats
 	template <typename float_t> inline
 	float_t dchisq(float_t x, float_t nu=1)
 	{
-		return dgamma(x, 2, nu/2);
+		return dgamma(x, (float_t) 2, nu/2);
 	}
 
 	template <typename float_t> inline
 	float_t pchisq(float_t x, float_t nu=1)
 	{
-		return pgamma(x, 2, nu/2);
+		return pgamma(x, (float_t) 2, nu/2);
 	}
 
 	// Beta distribution
