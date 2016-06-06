@@ -122,28 +122,51 @@ namespace maths
 		return beta(a, b) - ibeta(a, b, p);
 	}
 
-	/// The generalized Reimann zeta function for real x > 1
-	template <typename float_t> float_t zeta(float_t x, float_t eps=1e-9)
+	/// The Dirichlet eta function for real x > 0
+	template <typename float_t> float_t eta(float_t x, float_t eps=1e-9)
 	{
-		/* based on product of prime quotients (doesn't work)
-		float_t s, t, z = 1;
-		uintmax_t p = 2, q = 3;
-		do {
-		 if (gcd(p, q) == 1) {
-		  s = std::pow(q, x);
-		  t = s/(s - 1);
-		  z *= t;
-		  p *= q;
-		 }
-		 q += 2;
-		}
-		while (1 < t);
-		return z;
-		// */
-		float_t r, s = 1, t, n = 1;
-		do r = std::pow(++n, x), t = 1/r, s += t;
+		bool a = true;
+		float_t t, s = 1, n = 1;
+		do t = std::pow(++n, -x), a = !a, a ? s += t : s -= t;
 		while (eps < t);
 		return s;
+	}
+
+	/// Policy for calculation of zeta function
+	enum class Zeta { Riemann, Euler, Dirichlet };
+	/// The generalized Reimann zeta function for real x > 1
+	template <typename float_t> float_t zeta(float_t x, float_t eps=1e-9, Zeta z=Zeta::Dirichlet)
+	{
+		switch (z) // choose policy
+		{
+		default:
+		case Zeta::Dirichlet:
+			// better convergence with eta identity
+			return eta(x, eps)/(1 - std::exp2(1 - x));
+		case Zeta::Riemann:
+			{
+			float_t t, s = 1, n = 1;
+			do t = std::pow(++n, -x), s += t;
+			while (eps < t);
+			return s;
+			}
+		case Zeta::Euler:
+			{
+			uintmax_t p = 2, q = 3;
+			float_t t = std::pow(p, -x);
+			float_t s = 1 - t;
+			do {
+			 if (gcd(p, q) == 1) {
+				t = std::pow(q, -x);
+				s *= 1 - t;
+				p *= q;
+			 }
+			 q += 2;
+			}
+			while (eps < t);
+			return 1/s;
+			}
+		};
 	}
 
 	/// Measures the area under the bell curve for errors of size x

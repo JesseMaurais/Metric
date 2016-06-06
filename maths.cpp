@@ -1,9 +1,20 @@
 #include "maths.hpp"
 #include <lux/lux.hpp>
+using namespace maths;
+
+template <> inline Zeta lux_to<Zeta>(lua_State *state, int index)
+{
+	const char *opts[] = {"-", "+", "*", nullptr};
+	switch (luaL_checkoption(state, index, "-", opts))
+	{
+	case 0: return Zeta::Dirichlet;
+	case 1: return Zeta::Riemann;
+	case 2: return Zeta::Euler;
+	};
+}
 
 extern "C" int luaopen_maths(lua_State *state)
 {
-	using namespace maths;
 	luaL_Reg regs[] =
 	{
 	// common factors
@@ -23,7 +34,8 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"beta", lux_cast(beta<lua_Number>)},
 	{"ibeta", lux_cast(ibeta<lua_Number>)},
 	{"ibetac", lux_cast(ibetac<lua_Number>)},
-	// Reimann zeta
+	// Dirichlet eta & Reimann zeta
+	{"eta", lux_cast(eta<lua_Number>)},
 	{"zeta", lux_cast(zeta<lua_Number>)},
 	// error & complement
 	{"erf", lux_cast(erf<lua_Number>)},
