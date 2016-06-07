@@ -44,8 +44,8 @@ namespace maths
 		return m;
 	}
 
-	/// The primorial of n, n# = product of primes up to n
-	template <typename int_t> int_t prim(int_t n)
+	/// The primorial of n, n# = product of primes up to n + 1
+	template <typename int_t> inline int_t prim(int_t n)
 	{
 		if (n < 2) return 1;
 		int_t p = 2, q = 3;
@@ -56,8 +56,24 @@ namespace maths
 		return p;
 	}
 
+	/// Alternate primorial, p(n)# = product of first n primes
+	template <typename int_t> inline int_t primo(int_t n)
+	{
+		if (n < 1) return 1;
+		else --n;
+		int_t p = 2, q = 3;
+		while (n) {
+		 if (gcd(p, q) == 1) {
+		  p *= q;
+		  --n;
+		 }
+		 q += 2;
+		}
+		return p;
+	}
+
 	/// The k permutations of n elements, n!/(n - k)!
-	template <typename int_t> int_t perm(int_t n, int_t k)
+	template <typename int_t> inline int_t perm(int_t n, int_t k)
 	{
 		k = n - k;
 		int_t m = 1;
@@ -66,7 +82,7 @@ namespace maths
 	}
 
 	/// The k combinations of n elements, n!/k!(n - k)!
-	template <typename int_t> int_t comb(int_t n, int_t k)
+	template <typename int_t> inline int_t comb(int_t n, int_t k)
 	{
 		k = std::min(k, n - k);
 		int_t m = 1, r = 1;
@@ -87,7 +103,7 @@ namespace maths
 	}
 
 	/// The lower incomplete gamma function
-	template <typename float_t> float_t igamma(float_t a, float_t x)
+	template <typename float_t> inline float_t igamma(float_t a, float_t x)
 	{
 		float_t s = 0, t = std::pow(x, a)/a;
 		do s += t, t *= x, t /= ++a;
@@ -97,19 +113,19 @@ namespace maths
 	}
 
 	/// The upper incomplete gamma function (lower's complement)
-	template <typename float_t> float_t igammac(float_t a, float_t x)
+	template <typename float_t> inline float_t igammac(float_t a, float_t x)
 	{
 		return std::tgamma(a) - igamma(a, x);
 	}
 	
 	/// Extends combinations into the field of real numbers
-	template <typename float_t> float_t beta(float_t a, float_t b)
+	template <typename float_t> inline float_t beta(float_t a, float_t b)
 	{
 		return std::tgamma(a)*std::tgamma(b)/std::tgamma(a + b);
 	}
 	
 	/// The lower incomplete beta function
-	template <typename float_t> float_t ibeta(float_t a, float_t b, float_t p)
+	template <typename float_t> inline float_t ibeta(float_t a, float_t b, float_t p)
 	{
 		float_t t = std::pow(p, a);
 		float_t s = 0, n = 1, u = 1 - b;
@@ -119,23 +135,23 @@ namespace maths
 	}
 
 	/// The upper incomplete beta function (lower's complement)
-	template <typename float_t> float_t ibetac(float_t a, float_t b, float_t p)
+	template <typename float_t> inline float_t ibetac(float_t a, float_t b, float_t p)
 	{
 		return beta(a, b) - ibeta(a, b, p);
 	}
 
 	/// The Dirichlet eta function for real x > 0
-	template <typename float_t> float_t eta(float_t x, float_t eps=1e-9)
+	template <typename float_t> inline float_t eta(float_t x, float_t eps=1e-9)
 	{
 		bool a = true;
 		float_t t, s = 1, n = 1;
 		do t = std::pow(++n, -x), a = !a, a ? s += t : s -= t;
-		while (eps < t);
+		while (eps < std::abs(t));
 		return s;
 	}
 
 	/// The Reimann zeta function for real x > 1, defined as a discrete sum
-	template <typename float_t> float_t zeta_s(float_t x, float_t eps=1e-9)
+	template <typename float_t> inline float_t zeta_s(float_t x, float_t eps=1e-9)
 	{
 		float_t t, s = 1, n = 1;
 		do t = std::pow(++n, -x), s += t;
@@ -144,7 +160,7 @@ namespace maths
 	}
 
 	/// The Reimann zeta function for real x > 1, using Euler's product
-	template <typename float_t> float_t zeta_p(float_t x, float_t eps=1e-9)
+	template <typename float_t> inline float_t zeta_p(float_t x, float_t eps=1e-9)
 	{
 		uintmax_t p = 2, q = 3;
 		float_t t = std::pow(p, -x);
@@ -162,10 +178,20 @@ namespace maths
 	}
 
 	/// The Reimann zeta function for real x > 1, Dirichlet's eta identity
-	template <typename float_t> float_t zeta_e(float_t x, float_t eps=1e-9)
+	template <typename float_t> inline float_t zeta_e(float_t x, float_t eps=1e-9)
 	{
 		// Better convergence with eta identity
 		return eta(x, eps)/(1 - std::exp2(1 - x));
+	}
+
+	/// The Gaussian hypergeometric function, not defined for non-positive integer c or |x| >= 1
+	template <typename float_t> inline float_t hyper(float_t a, float_t b, float_t c, float_t x, float_t eps=1e-9)
+	{
+		uintmax_t n = 0;
+		float_t s = 0, t = 1;
+		do s += t, t *= a++, t /= c++, t *= b++, t /= ++n, t *= x;
+		while (eps < t);
+		return s;
 	}
 
 	/// Measures the area under the bell curve for errors of size x
