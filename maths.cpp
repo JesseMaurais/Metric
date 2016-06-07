@@ -12,6 +12,7 @@ extern "C" int luaopen_maths(lua_State *state)
 	// combinatorial
 	{"fact", lux_cast(fact<lua_Integer>)},
 	{"prim", lux_cast(prim<lua_Integer>)},
+	{"primo", lux_cast(primo<lua_Integer>)},
 	{"perm", lux_cast(perm<lua_Integer>)},
 	{"comb", lux_cast(comb<lua_Integer>)},
 	// gamma
