@@ -2,17 +2,6 @@
 #include <lux/lux.hpp>
 using namespace maths;
 
-template <> inline Zeta lux_to<Zeta>(lua_State *state, int index)
-{
-	const char *opts[] = {"-", "+", "*", nullptr};
-	switch (luaL_checkoption(state, index, "-", opts))
-	{
-	case 0: return Zeta::Dirichlet;
-	case 1: return Zeta::Riemann;
-	case 2: return Zeta::Euler;
-	};
-}
-
 extern "C" int luaopen_maths(lua_State *state)
 {
 	luaL_Reg regs[] =
@@ -36,7 +25,9 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"ibetac", lux_cast(ibetac<lua_Number>)},
 	// Dirichlet eta & Reimann zeta
 	{"eta", lux_cast(eta<lua_Number>)},
-	{"zeta", lux_cast(zeta<lua_Number>)},
+	{"zeta_s", lux_cast(zeta_s<lua_Number>)},
+	{"zeta_p", lux_cast(zeta_p<lua_Number>)},
+	{"zeta_e", lux_cast(zeta_e<lua_Number>)},
 	// error & complement
 	{"erf", lux_cast(erf<lua_Number>)},
 	{"erfc", lux_cast(erfc<lua_Number>)},

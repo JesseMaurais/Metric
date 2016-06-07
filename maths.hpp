@@ -1,7 +1,9 @@
+#ifndef Metric_maths
+#define Metric_maths
+
 #include <algorithm>
 #include <utility>
 #include <cmath>
-
 
 namespace maths
 {
@@ -19,8 +21,8 @@ namespace maths
 	constexpr auto sqrt2   = 1.414213562373095048801688724209698079L;
 	constexpr auto ngamma  = 0.577215664901532860606512090082402431L;
 	
-	/// The greatest common divisor, so that m|gcd(m, n) and n|gcd(m, n)
-	template <typename int_t> int_t gcd(int_t m, int_t n)
+	/// The greatest common divisor, the greatest d so that m|d and n|d
+	template <typename int_t> inline int_t gcd(int_t m, int_t n)
 	{
 		if (n < m) std::swap(m, n);
 		int_t r;
@@ -29,20 +31,20 @@ namespace maths
 	}
 
 	/// The lowest common multiple, so that gcd(m, n)*lcm(m, n) = m*n
-	template <typename int_t> int_t lcm(int_t m, int_t n)
+	template <typename int_t> inline int_t lcm(int_t m, int_t n)
 	{
 		return m * (n / gcd(m, n));
 	}
 
-	/// The factorial of n, n! = n(n - 1)(n - 2)...
-	template <typename int_t> int_t fact(int_t n)
+	/// The factorial of n, n! = n(n - 1)(n - 2)...(2)(1)
+	template <typename int_t> inline int_t fact(int_t n)
 	{
 		int_t m = 1;
 		while (n) m *= n--;
 		return m;
 	}
 
-	/// The primorial of n, the product of primes up to n
+	/// The primorial of n, n# = product of primes up to n
 	template <typename int_t> int_t prim(int_t n)
 	{
 		if (n < 2) return 1;
@@ -132,41 +134,38 @@ namespace maths
 		return s;
 	}
 
-	/// Policy for calculation of zeta function
-	enum class Zeta { Riemann, Euler, Dirichlet };
-	/// The generalized Reimann zeta function for real x > 1
-	template <typename float_t> float_t zeta(float_t x, float_t eps=1e-9, Zeta z=Zeta::Dirichlet)
+	/// The Reimann zeta function for real x > 1, defined as a discrete sum
+	template <typename float_t> float_t zeta_s(float_t x, float_t eps=1e-9)
 	{
-		switch (z) // choose policy
-		{
-		default:
-		case Zeta::Dirichlet:
-			// better convergence with eta identity
-			return eta(x, eps)/(1 - std::exp2(1 - x));
-		case Zeta::Riemann:
-			{
-			float_t t, s = 1, n = 1;
-			do t = std::pow(++n, -x), s += t;
-			while (eps < t);
-			return s;
-			}
-		case Zeta::Euler:
-			{
-			uintmax_t p = 2, q = 3;
-			float_t t = std::pow(p, -x);
-			float_t s = 1 - t;
-			do {
-			 if (gcd(p, q) == 1) {
-				t = std::pow(q, -x);
-				s *= 1 - t;
-				p *= q;
-			 }
-			 q += 2;
-			}
-			while (eps < t);
-			return 1/s;
-			}
-		};
+		float_t t, s = 1, n = 1;
+		do t = std::pow(++n, -x), s += t;
+		while (eps < t);
+		return s;
+	}
+
+	/// The Reimann zeta function for real x > 1, using Euler's product
+	template <typename float_t> float_t zeta_p(float_t x, float_t eps=1e-9)
+	{
+		uintmax_t p = 2, q = 3;
+		float_t t = std::pow(p, -x);
+		float_t s = 1 - t;
+		do {
+		 if (gcd(p, q) == 1) {
+			t = std::pow(q, -x);
+			s *= 1 - t;
+			p *= q;
+		 }
+		 q += 2;
+		}
+		while (eps < t);
+		return 1/s;
+	}
+
+	/// The Reimann zeta function for real x > 1, Dirichlet's eta identity
+	template <typename float_t> float_t zeta_e(float_t x, float_t eps=1e-9)
+	{
+		// Better convergence with eta identity
+		return eta(x, eps)/(1 - std::exp2(1 - x));
 	}
 
 	/// Measures the area under the bell curve for errors of size x
@@ -175,7 +174,7 @@ namespace maths
 		return std::erf(x);
 	}
 
-	/// Measures the complement of the error function
+	/// Measures the complement of the error function (the tails)
 	template <typename float_t> inline float_t erfc(float_t x)
 	{
 		return std::erfc(x);
@@ -187,25 +186,25 @@ namespace maths
 		return std::pow(x, p);
 	}
 
-	/// The square root of x
+	/// The square root of x for real x >= 0
 	template <typename float_t> inline float_t sqrt(float_t x)
 	{
 		return std::sqrt(x);
 	}
 
-	/// The cube root of x
+	/// The cube root of x for real x
 	template <typename float_t> inline float_t cbrt(float_t x)
 	{
 		return std::cbrt(x);
 	}
 
-	/// The square root of the sum of the squares of x and y
+	/// Equivalent to x*x + y*y but may be more precise
 	template <typename float_t> inline float_t hypot(float_t x, float_t y)
 	{
 		return std::hypot(x, y);
 	}
 
-	/// Equivalent to x*y + z but more precise
+	/// Equivalent to x*y + z but may be more precise
 	template <typename float_t> inline float_t fma(float_t x, float_t y, float_t z)
 	{
 		return std::fma(x, y, z);
@@ -214,7 +213,11 @@ namespace maths
 	/// Euler's number raised to the exponent x
 	template <typename float_t> inline float_t exp(float_t x)
 	{
-		return std::exp(x);
+		uintmax_t n = 0;
+		float_t s = 0, t = 1;
+		do s += t, t *= x, t /= ++n;
+		while (t);
+		return s;
 	}
 
 	/// The number 2 raised to the exponent x
@@ -223,7 +226,7 @@ namespace maths
 		return std::exp2(x);
 	}
 
-	/// Equivalent to x*exp2(p) but more precise
+	/// Equivalent to x*exp2(p) but may be more precise
 	template <typename float_t> inline float_t ldexp(float_t x, int p)
 	{
 		return std::ldexp(x, p);
@@ -241,13 +244,13 @@ namespace maths
 		return std::log(x)/std::log(b);
 	}
 
-	/// The logarithm of x expressed in base 2, so log2(x) = log(x, 2)
+	/// The logarithm of x expressed in base 2, so log2(x) = ln(x)/ln2
 	template <typename float_t> inline float_t log2(float_t x)
 	{
 		return std::log2(x);
 	}
 
-	/// The logarithm of x expressed in base 10, so log10(x) = log(x, 10)
+	/// The logarithm of x expressed in base 10, so log10(x) = ln(x)/ln10
 	template <typename float_t> inline float_t log10(float_t x)
 	{
 		return std::log10(x);
@@ -320,4 +323,5 @@ namespace maths
 	
 }; // namespace maths
 
+#endif // Metric_maths
 	
