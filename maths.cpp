@@ -1,9 +1,9 @@
 #include "maths.hpp"
 #include <lux/lux.hpp>
-using namespace maths;
 
 extern "C" int luaopen_maths(lua_State *state)
 {
+	using namespace maths;
 	luaL_Reg regs[] =
 	{
 	// common factors
