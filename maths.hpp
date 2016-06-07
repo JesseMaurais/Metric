@@ -146,7 +146,7 @@ namespace maths
 		bool a = true;
 		float_t t, s = 1, n = 1;
 		do t = std::pow(++n, -x), a = !a, a ? s += t : s -= t;
-		while (eps < std::abs(t));
+		while (eps < t);
 		return s;
 	}
 
@@ -185,12 +185,12 @@ namespace maths
 	}
 
 	/// The Gaussian hypergeometric function, not defined for non-positive integer c or |x| >= 1
-	template <typename float_t> inline float_t hyper(float_t a, float_t b, float_t c, float_t x, float_t eps=1e-9)
+	template <typename float_t> inline float_t hyper(float_t a, float_t b, float_t c, float_t x)
 	{
 		uintmax_t n = 0;
 		float_t s = 0, t = 1;
 		do s += t, t *= a++, t /= c++, t *= b++, t /= ++n, t *= x;
-		while (eps < t);
+		while (t);
 		return s;
 	}
 
