@@ -1,5 +1,6 @@
 CC=g++
-CFLAGS=-std=c++17
+CFLAGS=-std=c++14 -Wall
+SRC=maths.hpp stats.hpp
 OBJ=maths.so stats.so
 DIR=/usr/local/lib/lua/5.3/
 
@@ -15,12 +16,6 @@ install:
 uninstall:
 	rm $(addprefix $(DIR), $(OBJ))
 
-%.so: %.cpp %.hpp
+%.so: %.cpp $(SRC)
 	$(CC) $(CFLAGS) -shared -o $@ -fpic $< -lm
-
-blas.so: blas.cpp cblas.hpp
-	$(CC) $(CFLAGS) -shared -o $@ -fpic $< -lblas
-
-lapack.so: lapack.cpp lapacke.hpp
-	$(CC) $(CFLAGS) -shared -o $@ -fpic $< -llapacke
 

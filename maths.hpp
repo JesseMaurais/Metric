@@ -145,7 +145,7 @@ namespace maths
 	{
 		bool a = true;
 		float_t t, s = 1, n = 1;
-		do t = std::pow(++n, -x), a = !a, a ? s += t : s -= t;
+		do t = std::pow(++n, -x), (a = !a) ? s += t : s -= t;
 		while (eps < t);
 		return s;
 	}
@@ -258,14 +258,14 @@ namespace maths
 		return std::ldexp(x, p);
 	}
 
-	/// The natural logarithm of x, so exp(log(x)) = x
-	template <typename float_t> inline float_t log(float_t x)
+	/// The natural logarithm of x, so exp(ln(x)) = x
+	template <typename float_t> inline float_t ln(float_t x)
 	{
 		return std::log(x);
 	}
 
 	/// The logarithm of x expressed in base b, so pow(b, log(x, b)) = x
-	template <typename float_t> inline float_t logb(float_t x, float_t b)
+	template <typename float_t> inline float_t log(float_t x, float_t b)
 	{
 		return std::log(x)/std::log(b);
 	}
@@ -282,34 +282,46 @@ namespace maths
 		return std::log10(x);
 	}	
 
+	/// Leg opposite an angle, over the hypotenuse, in a right triangle
 	template <typename float_t> inline float_t sin(float_t x)
 	{
-		return std::sin(x);
+		bool a = true;
+		uintmax_t n = 1;
+		float_t xx = x*x, t = x, s = t;
+		do t *= xx, t /= ++n, t /= ++n, (a = !a) ? s += t : s -= t;
+		while (t);
+		return s;
 	}
 
+	/// Leg adjacent an angle, over the hypotenuse, in a right triangle
 	template <typename float_t> inline float_t cos(float_t x)
 	{
-		return std::cos(x);
+		bool a = true;
+		uintmax_t n = 0;
+		float_t xx = x*x, t = 1, s = t;
+		do t *= xx, t /= ++n, t /= ++n, (a = !a) ? s += t : s -= t;
+		while (t);
+		return s;
 	}
 
 	template <typename float_t> inline float_t tan(float_t x)
 	{
-		return std::tan(x);
+		return sin(x)/cos(x);
 	}
 
 	template <typename float_t> inline float_t asin(float_t x)
 	{
-		return std::asin(x);
+		return x*hyper(0.5, 0.5, 1.5, x*x);
 	}
 
 	template <typename float_t> inline float_t acos(float_t x)
 	{
-		return std::acos(x);
+		return pi_2 - asin(x);
 	}
 
 	template <typename float_t> inline float_t atan(float_t x)
 	{
-		return std::atan(x);
+		return x*hyper(0.5, 1.0, 1.5, -x*x);
 	}
 
 	template <typename float_t> inline float_t atan2(float_t y, float_t x)

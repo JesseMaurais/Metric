@@ -16,7 +16,7 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"perm", lux_cast(perm<lua_Integer>)},
 	{"comb", lux_cast(comb<lua_Integer>)},
 	// gamma
-	{"gamma", lux_cast(tgamma<lua_Number>)},
+	{"tgamma", lux_cast(tgamma<lua_Number>)},
 	{"igamma", lux_cast(igamma<lua_Number>)},
 	{"igammac", lux_cast(igammac<lua_Number>)},
 	{"lngamma", lux_cast(lgamma<lua_Number>)},
@@ -34,18 +34,20 @@ extern "C" int luaopen_maths(lua_State *state)
 	// error & complement
 	{"erf", lux_cast(erf<lua_Number>)},
 	{"erfc", lux_cast(erfc<lua_Number>)},
+	// linear
+	{"line", lux_cast(fma<lua_Number>)},
 	// power
 	{"pow", lux_cast(pow<lua_Number>)},
 	{"sqrt", lux_cast(sqrt<lua_Number>)},
 	{"cbrt", lux_cast(cbrt<lua_Number>)},
-	{"hyp", lux_cast(hypot<lua_Number>)},
+	{"hypot", lux_cast(hypot<lua_Number>)},
 	// exponential
 	{"exp", lux_cast(exp<lua_Number>)},
 	{"exp2", lux_cast(exp<lua_Number>)},
 	{"ldexp", lux_cast(ldexp<lua_Number>)},
 	// logarithmic
-	{"ln", lux_cast(log<lua_Number>)},
-	{"log", lux_cast(logb<lua_Number>)},
+	{"ln", lux_cast(ln<lua_Number>)},
+	{"log", lux_cast(log<lua_Number>)},
 	{"log2", lux_cast(log2<lua_Number>)},
 	{"log10", lux_cast(log10<lua_Number>)},
 	// trigonometric
@@ -63,8 +65,6 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"asinh", lux_cast(asinh<lua_Number>)},
 	{"acosh", lux_cast(acosh<lua_Number>)},
 	{"atanh", lux_cast(atanh<lua_Number>)},
-	// lossless linear
-	{"line", lux_cast(fma<lua_Number>)},
 	// end
 	{nullptr}
 	};
@@ -83,7 +83,7 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"pi2_6", pi2_6},
 	{"sqrt2pi", sqrt2pi},
 	{"sqrt2", sqrt2},
-	{"ngamma", ngamma},
+	{"gamma", ngamma},
 	{nullptr}
 	};
 	lux_settable(state, nums);
