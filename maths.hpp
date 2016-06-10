@@ -48,11 +48,11 @@ namespace maths
 	template <typename int_t> int_t prim(int_t n)
 	{
 		if (n < 2) return 1;
+		else ++n;
 		int_t p = 2, q = 3;
-		while (n) {
+		while (q < n) {
 		 if (gcd(p, q) == 1) p *= q;
 		 q += 2;
-		 --n;
 		};
 		return p;
 	}
@@ -170,9 +170,9 @@ namespace maths
 		float_t s = 1 - t;
 		do {
 		 if (gcd(p, q) == 1) {
-			t = std::pow(q, -x);
-			s *= 1 - t;
-			p *= q;
+		  t = std::pow(q, -x);
+		  s *= 1 - t;
+		  p *= q;
 		 }
 		 q += 2;
 		}
@@ -283,7 +283,7 @@ namespace maths
 		return ln(x)/ln10;
 	}	
 
-	/// Leg opposite an angle, over the hypotenuse, in a right triangle
+	/// In a right triangle, the leg opposite an angle over the hypotenuse
 	template <typename float_t> float_t sin(float_t x)
 	{
 		bool a = true;
@@ -294,7 +294,7 @@ namespace maths
 		return s;
 	}
 
-	/// Leg adjacent an angle, over the hypotenuse, in a right triangle
+	/// In a right triangle, the leg adjacent an angle over the hypotenuse
 	template <typename float_t> float_t cos(float_t x)
 	{
 		bool a = true;
@@ -305,22 +305,22 @@ namespace maths
 		return s;
 	}
 
-	template <typename float_t> inline float_t tan(float_t x)
+	template <typename float_t> float_t tan(float_t x)
 	{
 		return sin(x)/cos(x);
 	}
 
-	template <typename float_t> inline float_t asin(float_t x)
+	template <typename float_t> float_t asin(float_t x)
 	{
 		return x*hyper(0.5, 0.5, 1.5, x*x);
 	}
 
-	template <typename float_t> inline float_t acos(float_t x)
+	template <typename float_t> float_t acos(float_t x)
 	{
 		return pi_2 - asin(x);
 	}
 
-	template <typename float_t> inline float_t atan(float_t x)
+	template <typename float_t> float_t atan(float_t x)
 	{
 		return x*hyper(0.5, 1.0, 1.5, -x*x);
 	}
@@ -330,19 +330,27 @@ namespace maths
 		return std::atan2(y, x);
 	}
 
-	template <typename float_t> inline float_t sinh(float_t x)
+	template <typename float_t> float_t sinh(float_t x)
 	{
-		return std::sinh(x);
+		uintmax_t n = 1;
+		float_t s = 0, t = x, xx = x*x;
+		do s += t, t *= xx, t /= ++n, t /= ++n;
+		while (t);
+		return s;
 	}
 
-	template <typename float_t> inline float_t cosh(float_t x)
+	template <typename float_t> float_t cosh(float_t x)
 	{
-		return std::cosh(x);
+		uintmax_t n = 0;
+		float_t s = 0, t = 1, xx = x*x;
+		do s += t, t *= xx, t /= ++n, t /= ++n;
+		while (t);
+		return s;
 	}
 
-	template <typename float_t> inline float_t tanh(float_t x)
+	template <typename float_t> float_t tanh(float_t x)
 	{
-		return std::tanh(x);
+		return sinh(x)/cosh(x);
 	}
 
 	template <typename float_t> inline float_t asinh(float_t x)
