@@ -26,26 +26,22 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"ibetac", lux_cast(ibetac<lua_Number>)},
 	// Dirichlet eta & Reimann zeta
 	{"eta", lux_cast(eta<lua_Number>)},
-	{"zeta_s", lux_cast(zeta_s<lua_Number>)},
+	{"zeta", lux_cast(zeta<lua_Number>)},
 	{"zeta_p", lux_cast(zeta_p<lua_Number>)},
 	{"zeta_e", lux_cast(zeta_e<lua_Number>)},
 	// hypergeometric
 	{"hyper", lux_cast(hyper<lua_Number>)},
+	{"cohyp", lux_cast(cohyp<lua_Number>)},
 	// error & complement
 	{"erf", lux_cast(erf<lua_Number>)},
 	{"erfc", lux_cast(erfc<lua_Number>)},
-	// linear
-	{"line", lux_cast(fma<lua_Number>)},
 	// power
 	{"pow", lux_cast(pow<lua_Number>)},
 	{"sqrt", lux_cast(sqrt<lua_Number>)},
 	{"cbrt", lux_cast(cbrt<lua_Number>)},
-	{"hypot", lux_cast(hypot<lua_Number>)},
-	// exponential
+	// exponential & logarithmic
 	{"exp", lux_cast(exp<lua_Number>)},
 	{"exp2", lux_cast(exp<lua_Number>)},
-	{"ldexp", lux_cast(ldexp<lua_Number>)},
-	// logarithmic
 	{"ln", lux_cast(ln<lua_Number>)},
 	{"log", lux_cast(log<lua_Number>)},
 	{"log2", lux_cast(log2<lua_Number>)},
