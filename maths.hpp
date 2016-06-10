@@ -1,6 +1,16 @@
 #ifndef Metric_maths
 #define Metric_maths
 
+/**
+ * The mathematical functions found in the C++ standard header, cmath, are
+ * provided as overloads for their argument types. Often they only forward
+ * their argument to a builtin function. This requires overloads for every
+ * newly supported data type. In fact, this is how C++ handles the complex
+ * number class as well as valarrays. Here we implement the same functions
+ * as templates so that they have the same definition for numbers of every
+ * type (floats or any  precision, complex, or valarray).
+ */
+
 #include <algorithm>
 #include <utility>
 #include <cmath>
