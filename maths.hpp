@@ -3,12 +3,11 @@
 
 /**
  * The mathematical functions found in the C++ standard header, cmath, are
- * provided as overloads for their argument types. Often they only forward
- * their argument to a builtin function. This requires overloads for every
- * newly supported data type. In fact, this is how C++ handles the complex
- * number class as well as valarrays. Here we implement the same functions
- * as templates so that they have the same definition for numbers of every
- * type (floats or any  precision, complex, or valarray).
+ * overloaded for each argument type. This requires overloads for each new
+ * type and is how C++ implements them for the complex number class and as
+ * well as valarrays. Here we implement the same functions as templates so
+ * we have the same the same definition for numbers of every argument type
+ * (complex, valarray, or floats of any precision).
  */
 
 #include <algorithm>
