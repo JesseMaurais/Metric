@@ -3,11 +3,29 @@
 
 /**
  * The mathematical functions found in the C++ standard header, cmath, are
- * overloaded for each argument type. This requires overloads for each new
- * type and is how C++ implements them for the complex number class and as
- * well as valarrays. Here we implement the same functions as templates so
- * we have the same function definition for numbers of every argument type
- * (complex, valarray, or floats of any precision).
+ * overloaded for each argument type, so they are rewritten for every type.
+ * type of argument. This is how C++ implements them for the complex number
+ * class and as well as valarrays. Here we implement the same functions as
+ * templates so each function has the same definition for numbers of every
+ * argument type. They should work for any objects for which the operators
+ * used in the functions are also supported. For many of them this will be
+ * prefix operators and compound assignment for any addition, subtraction,
+ * multiplication, and division. But so far I've only tested it on builtin
+ * numeric types.
+ *
+ * There is no error checking up to the validity of the input. Provided an
+ * argument has valid input (values are in range) the algorithms will work
+ * as expected. Inputs out of range have undefined behaviour and will most
+ * likely result in an infinite loop. This behaviour was decided by reason
+ * of algorithmic efficiency; as to no gimp proper usage with extra checks
+ * that can be done before calling.
+ *
+ * Iniitially I wrote this to try myself at numeric algorithms, to see how
+ * well I could do relative to existing software. The aim is to rewrite as
+ * many of the standard library math funtionas as I can, as well as useful
+ * functions that are not currently part of the standard. For example, the
+ * incomplete gamma, beta, and zeta functions. Some simpler functions like
+ * gcd, lcm, and combinatorial functions are also here.
  */
 
 #include <algorithm>
@@ -137,8 +155,8 @@ namespace maths
 	/// The lower incomplete beta function
 	template <typename float_t> float_t ibeta(float_t a, float_t b, float_t x)
 	{
-		float_t s = 0, t = std::pow(x, a);
 		float_t n = 1, u = 1 - b;
+		float_t s = 0, t = std::pow(x, a);
 		do s += t/a++, t *= u++, t /= n++, t *= x;
 		while (t);
 		return s;
@@ -153,10 +171,10 @@ namespace maths
 	/// The Dirichlet eta function for real x > 0
 	template <typename float_t> float_t eta(float_t x, float_t eps=1e-9)
 	{
-		bool a = true;
+		bool a = false;
 		uintmax_t n = 1;
-		float_t t, s = 1;
-		do t = std::pow(++n, -x), (a = !a) ? s += t : s -= t;
+		float_t s = 0, t = 1;
+		do (a = !a) ? s += t : s -= t, t = std::pow(++n, -x);
 		while (eps < t);
 		return s;
 	}
@@ -165,8 +183,8 @@ namespace maths
 	template <typename float_t> float_t zeta(float_t x, float_t eps=1e-9)
 	{
 		uintmax_t n = 1;
-		float_t t, s = 1;
-		do t = std::pow(++n, -x), s += t;
+		float_t s = 0, t = 1;
+		do s += t, t = std::pow(++n, -x);
 		while (eps < t);
 		return s;
 	}
@@ -199,9 +217,9 @@ namespace maths
 	/// The Gaussian hypergeometric function
 	template <typename float_t> float_t hyper(float_t a, float_t b, float_t c, float_t x)
 	{
-		uintmax_t n = 0;
-		float_t s = 0, t = 1;
-		do s += t, t *= a++, t /= c++, t *= b++, t /= ++n, t *= x;
+		uintmax_t n = 1;
+		float_t s = 1, t = x*a*b/c;
+		do s += t, t *= ++a, t /= ++c, t *= ++b, t /= ++n, t *= x;
 		while (t);
 		return s;
 	}
@@ -209,9 +227,9 @@ namespace maths
 	/// Kummer's confluent hypergeometric function
 	template <typename float_t> float_t cohyp(float_t a, float_t c, float_t x)
 	{
-		uintmax_t n = 0;
-		float_t s = 0, t = 1;
-		do s += t, t *= a++, t /= c++, t *= x, t /= ++n;
+		uintmax_t n = 1;
+		float_t s = 1, t = x*a/c;
+		do s += t, t *= ++a, t /= ++c, t *= x, t /= ++n;
 		while (t);
 		return s;
 	}
@@ -266,8 +284,8 @@ namespace maths
 	template <typename float_t> float_t ln(float_t x)
 	{
 		x = (x - 1)/(x + 1);
-		float_t xx = x*x;
 		uintmax_t n = 1;
+		const float_t xx = x*x;
 		float_t r = x, s = 0, t = r;
 		do s += t, r *= xx, n += 2, t = r/n;
 		while (t);
@@ -295,10 +313,11 @@ namespace maths
 	/// In a right triangle, the leg opposite an angle over the hypotenuse
 	template <typename float_t> float_t sin(float_t x)
 	{
-		bool a = true;
+		bool a = false;
 		uintmax_t n = 1;
-		float_t xx = x*x, t = x, s = t;
-		do t *= xx, t /= ++n, t /= ++n, (a = !a) ? s += t : s -= t;
+		const float_t xx = x*x;
+		float_t s = 0, t = x;
+		do (a = !a) ? s += t : s -= t, t *= xx, t /= ++n, t /= ++n;
 		while (t);
 		return s;
 	}
@@ -306,10 +325,11 @@ namespace maths
 	/// In a right triangle, the leg adjacent an angle over the hypotenuse
 	template <typename float_t> float_t cos(float_t x)
 	{
-		bool a = true;
+		bool a = false;
 		uintmax_t n = 0;
-		float_t xx = x*x, t = 1, s = t;
-		do t *= xx, t /= ++n, t /= ++n, (a = !a) ? s += t : s -= t;
+		const float_t xx = x*x;
+		float_t s = 0, t = 1;
+		do (a = !a) ? s += t : s -= t, t *= xx, t /= ++n, t /= ++n;
 		while (t);
 		return s;
 	}
@@ -342,7 +362,8 @@ namespace maths
 	template <typename float_t> float_t sinh(float_t x)
 	{
 		uintmax_t n = 1;
-		float_t s = 0, t = x, xx = x*x;
+		const float_t xx = x*x;
+		float_t s = 0, t = x;
 		do s += t, t *= xx, t /= ++n, t /= ++n;
 		while (t);
 		return s;
@@ -351,7 +372,8 @@ namespace maths
 	template <typename float_t> float_t cosh(float_t x)
 	{
 		uintmax_t n = 0;
-		float_t s = 0, t = 1, xx = x*x;
+		const float_t xx = x*x;
+		float_t s = 0, t = 1;
 		do s += t, t *= xx, t /= ++n, t /= ++n;
 		while (t);
 		return s;
