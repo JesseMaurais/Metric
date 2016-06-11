@@ -6,7 +6,7 @@
  * overloaded for each argument type. This requires overloads for each new
  * type and is how C++ implements them for the complex number class and as
  * well as valarrays. Here we implement the same functions as templates so
- * we have the same the same definition for numbers of every argument type
+ * we have the same function definition for numbers of every argument type
  * (complex, valarray, or floats of any precision).
  */
 
