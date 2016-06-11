@@ -3,9 +3,9 @@
 
 /**
  * The mathematical functions found in the C++ standard header, cmath, are
- * overloaded for each argument type, so they are rewritten for every type.
- * type of argument. This is how C++ implements them for the complex number
- * class and as well as valarrays. Here we implement the same functions as
+ * overloaded for each argument type, so they have to be rewritten for any
+ * new types. This is how standard C++ implements the complex number class
+ * and valarrays; using overloads. Here we implement the same functions as
  * templates so each function has the same definition for numbers of every
  * argument type. They should work for any objects for which the operators
  * used in the functions are also supported. For many of them this will be
@@ -17,8 +17,9 @@
  * argument has valid input (values are in range) the algorithms will work
  * as expected. Inputs out of range have undefined behaviour and will most
  * likely result in an infinite loop. This behaviour was decided by reason
- * of algorithmic efficiency; as to no gimp proper usage with extra checks
- * that can be done before calling.
+ * of algorithmic efficiency; so that proper uses are not slowed with more
+ * error checks than necessary, especially when caller can make these same
+ * input checks themselves.
  *
  * Iniitially I wrote this to try myself at numeric algorithms, to see how
  * well I could do relative to existing software. The aim is to rewrite as
