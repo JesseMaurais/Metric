@@ -18,10 +18,10 @@
  * as expected. Inputs out of range have undefined behaviour and will most
  * likely result in an infinite loop. This behaviour was decided by reason
  * of algorithmic efficiency; so that proper uses are not slowed with more
- * error checks than necessary, especially when caller can make these same
- * input checks themselves.
+ * error checks than necessary, especially when the caller can do the same
+ * input checks themselves beforehand.
  *
- * Iniitially I wrote this to try myself at numeric algorithms, to see how
+ * Initially I wrote this to test myself at numeric algorithms, to see how
  * well I could do relative to existing software. The aim is to rewrite as
  * many of the standard library math funtionas as I can, as well as useful
  * functions that are not currently part of the standard. For example, the
