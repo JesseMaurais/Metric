@@ -15,17 +15,20 @@
  * There is no error checking on the validity of the argument. Provided an
  * argument has valid input (values are in range) the algorithms will work
  * as expected. Inputs out of range have undefined behaviour and will most
- * likely result in an infinite loop. This behaviour was decided by reason
- * of algorithmic efficiency, so that proper usage is not slowed with more
- * error checks than necessary, especially when the caller can do the same
- * argument checks themselves beforehand.
+ * likely result in an infinite loop.
  *
- * I initially wrote this to try myself with numeric computing, to see how
+ * I wrote this as a test for myself on numeric computing, to discover how
  * well I could do relative to existing software. The aim is to rewrite as
- * many of the standard library math funtionas as I can, plus other useful
+ * many of the standard library math functions as I can, plus other useful
  * functions that are not currently part of the standard. For example, the
  * incomplete gamma, beta, and zeta functions. Some simpler functions like
  * gcd, lcm, and combinatorial functions are also here.
+ *
+ * I do not claim that this is the best way to implement them. There might
+ * be faster methods, though I tried to make them fast. More accurate ways
+ * might also exist. And no doubt there are "safer" methods out there. But
+ * they seem to work well enough and I hope they serve as simple reference
+ * for how such functions might be implemented.
  */
 
 #include <algorithm>
