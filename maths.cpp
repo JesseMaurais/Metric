@@ -31,7 +31,7 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"zeta_e", lux_cast(zeta_e<lua_Number>)},
 	// hypergeometric
 	{"hyper", lux_cast(hyper<lua_Number>)},
-	{"cohyp", lux_cast(cohyp<lua_Number>)},
+	{"kummer", lux_cast(kummer<lua_Number>)},
 	// error & complement
 	{"erf", lux_cast(erf<lua_Number>)},
 	{"erfc", lux_cast(erfc<lua_Number>)},

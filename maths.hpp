@@ -3,27 +3,26 @@
 
 /**
  * The mathematical functions found in the C++ standard header, cmath, are
- * overloaded for each argument type, so they have to be rewritten for any
- * new types. This is how standard C++ implements the complex number class
+ * overloaded for each argument type, so they have to be rewritten for all
+ * new types. This is how they're implemented for the complex number class
  * and valarrays; using overloads. Here we implement the same functions as
  * templates so each function has the same definition for numbers of every
  * argument type. They should work for any objects for which the operators
  * used in the functions are also supported. For many of them this will be
- * prefix operators and compound assignment for any addition, subtraction,
- * multiplication, and division. But so far I've only tested it on builtin
- * numeric types.
+ * no more than the prefix operators and compound assignment operators. So
+ * far they have been tested on POD types.
  *
- * There is no error checking up to the validity of the input. Provided an
+ * There is no error checking on the validity of the argument. Provided an
  * argument has valid input (values are in range) the algorithms will work
  * as expected. Inputs out of range have undefined behaviour and will most
  * likely result in an infinite loop. This behaviour was decided by reason
- * of algorithmic efficiency; so that proper uses are not slowed with more
+ * of algorithmic efficiency, so that proper usage is not slowed with more
  * error checks than necessary, especially when the caller can do the same
- * input checks themselves beforehand.
+ * argument checks themselves beforehand.
  *
- * Initially I wrote this to test myself at numeric algorithms, to see how
+ * I initially wrote this to try myself with numeric computing, to see how
  * well I could do relative to existing software. The aim is to rewrite as
- * many of the standard library math funtionas as I can, as well as useful
+ * many of the standard library math funtionas as I can, plus other useful
  * functions that are not currently part of the standard. For example, the
  * incomplete gamma, beta, and zeta functions. Some simpler functions like
  * gcd, lcm, and combinatorial functions are also here.
@@ -226,7 +225,7 @@ namespace maths
 	}
 
 	/// Kummer's confluent hypergeometric function
-	template <typename float_t> float_t cohyp(float_t a, float_t c, float_t x)
+	template <typename float_t> float_t kummer(float_t a, float_t c, float_t x)
 	{
 		uintmax_t n = 1;
 		float_t s = 1, t = x*a/c;
@@ -236,15 +235,16 @@ namespace maths
 	}
 
 	/// Measures the area under the bell curve for errors of size x
-	template <typename float_t> float_t erf(float_t x)
+	template <typename float_t> float_t erfc(float_t x)
 	{
-		return std::erf(x);
+		constexpr auto sqrtpi = sqrt2pi/sqrt2;
+		return igammac<float_t>(0.5, x*x)/sqrtpi;
 	}
 
 	/// Measures the complement of the error function (the tails)
-	template <typename float_t> float_t erfc(float_t x)
+	template <typename float_t> float_t erf(float_t x)
 	{
-		return std::erfc(x);
+		return 1.0 - erfc(x);
 	}
 	
 	/// The power of x raised to the exponent p
