@@ -71,6 +71,15 @@ namespace maths
 		return m;
 	}
 
+	/// The semifactorial of k, (2k)!! = (2k)(2k - 2)(2k - 4)...(4)(2)
+	template <typename int_t> int_t facts(int_t k)
+	{
+		// (2k)!! = (k!)(2^k)
+		int_t m = 1, n = 1;
+		while (k) m *= k--, n <<= 1;
+		return m*n;
+	}
+
 	/// The primorial of n, n# = product of primes up to n + 1
 	template <typename int_t> int_t prim(int_t n)
 	{
@@ -234,14 +243,14 @@ namespace maths
 		return s;
 	}
 
-	/// Measures the area under the bell curve for errors of size x
+	/// Measures the complement of the error function (the tails)
 	template <typename float_t> float_t erfc(float_t x)
 	{
 		constexpr auto sqrtpi = sqrt2pi/sqrt2;
 		return igammac<float_t>(0.5, x*x)/sqrtpi;
 	}
 
-	/// Measures the complement of the error function (the tails)
+	/// Measures the area under the bell curve for errors of size x
 	template <typename float_t> float_t erf(float_t x)
 	{
 		return 1.0 - erfc(x);
