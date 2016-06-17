@@ -365,9 +365,13 @@ namespace maths
 		return x*hyper<float_t>(0.5, 1.0, 1.5, -x*x);
 	}
 
-	template <typename float_t> inline float_t atan2(float_t y, float_t x)
+	template <typename float_t> float_t atan2(float_t y, float_t x)
 	{
-		return std::atan2(y, x);
+		if (x > 0) return atan(y/x);
+		if (x < 0) return atan(y/x) + (y < 0 ? -pi : +pi);
+		if (y > 0) return +pi_2;
+		if (y < 0) return -pi_2;
+		return NAN;
 	}
 
 	template <typename float_t> float_t sinh(float_t x)
