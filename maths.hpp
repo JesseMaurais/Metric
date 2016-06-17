@@ -345,26 +345,31 @@ namespace maths
 		return s;
 	}
 
+	/// Slope of tangent line on a circle at angle x from the origin
 	template <typename float_t> float_t tan(float_t x)
 	{
 		return sin(x)/cos(x);
 	}
 
+	/// Arcsine returns the angle of a given sine
 	template <typename float_t> float_t asin(float_t x)
 	{
 		return x*hyper<float_t>(0.5, 0.5, 1.5, x*x);
 	}
 
+	/// Arccosine returns the angle of a given cosine
 	template <typename float_t> float_t acos(float_t x)
 	{
 		return pi_2 - asin(x);
 	}
 
+	/// Arctangent returns the angle of a given tangent
 	template <typename float_t> float_t atan(float_t x)
 	{
 		return x*hyper<float_t>(0.5, 1.0, 1.5, -x*x);
 	}
 
+	/// Deduces the quadrant correct angle of a given sine and cosine
 	template <typename float_t> float_t atan2(float_t y, float_t x)
 	{
 		if (x > 0) return atan(y/x);
@@ -374,6 +379,7 @@ namespace maths
 		return NAN;
 	}
 
+	/// Rise of the point on an equilateral hyperbola at half of angle x
 	template <typename float_t> float_t sinh(float_t x)
 	{
 		uintmax_t n = 1;
@@ -384,6 +390,7 @@ namespace maths
 		return s;
 	}
 
+	/// Run of the point on equilateral hyperbola at half of angle x
 	template <typename float_t> float_t cosh(float_t x)
 	{
 		uintmax_t n = 0;
@@ -394,21 +401,25 @@ namespace maths
 		return s;
 	}
 
+	/// Slope of a line meeting a hyperbola at half of angle x from origin
 	template <typename float_t> float_t tanh(float_t x)
 	{
 		return sinh(x)/cosh(x);
 	}
 
+	/// The angle with a hyperbolic sine of x
 	template <typename float_t> float_t asinh(float_t x)
 	{
 		return ln(x + std::sqrt(x*x + 1));
 	}
 
+	/// The angle with a hyperbolic cosine of x
 	template <typename float_t> float_t acosh(float_t x)
 	{
 		return ln(x + std::sqrt(x*x - 1));
 	}
 
+	/// The angle with a hyperbolic tangent of x
 	template <typename float_t> float_t atanh(float_t x)
 	{
 		return x*hyper<float_t>(0.5, 1.0, 1.5, x*x);
