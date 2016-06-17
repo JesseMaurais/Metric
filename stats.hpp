@@ -1,6 +1,13 @@
 #ifndef Metric_stats
 #define Metric_stats
 
+/**
+ * This is an R-like interface for calculating probabilities and densities/mass
+ * for the common random variable distributions. Like maths.hpp this is more to
+ * test myself at numerical and statistical computing than it is intended for a
+ * high-performance computing. 
+ */
+
 #include "maths.hpp"
 
 namespace stats

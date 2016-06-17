@@ -1,6 +1,16 @@
 #include "maths.hpp"
 #include <lux/lux.hpp>
 
+/**
+ * Here is where we wanted to use templates rather than overloaded functions.
+ * In a Lux cast of overloaded functions we would have an overload resolution
+ * failure because we aren't using them with the arguments that specify which
+ * overload to use. We also get to specify these functions for the data types
+ * which Lua has already chosen to use. It is usual for them to be the widest
+ * version for their type (e.g. long long and long double) but it's better to
+ * never depend on such assumptions, and we do not have to.
+ */
+
 extern "C" int luaopen_maths(lua_State *state)
 {
 	using namespace maths;

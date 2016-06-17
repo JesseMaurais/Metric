@@ -249,8 +249,8 @@ namespace maths
 	/// Measures the complement of the error function (the tails)
 	template <typename float_t> float_t erfc(float_t x)
 	{
-		constexpr auto sqrtpi = sqrt2pi/sqrt2;
-		return igammac<float_t>(0.5, x*x)/sqrtpi;
+		constexpr auto isqrtpi = sqrt2/sqrt2pi;
+		return igammac<float_t>(0.5, x*x)*isqrtpi;
 	}
 
 	/// Measures the area under the bell curve for errors of size x
@@ -306,7 +306,7 @@ namespace maths
 	}
 
 	/// The logarithm of x expressed in base b, so pow(b, log(x, b)) = x
-	template <typename float_t> float_t log(float_t x, float_t b=2)
+	template <typename float_t> float_t log(float_t x, float_t b)
 	{
 		return ln(x)/ln(b);
 	}
@@ -326,11 +326,10 @@ namespace maths
 	/// In a right triangle, the leg opposite an angle over the hypotenuse
 	template <typename float_t> float_t sin(float_t x)
 	{
-		bool a = false;
 		uintmax_t n = 1;
-		const float_t xx = x*x;
+		const float_t xx = -x*x;
 		float_t s = 0, t = x;
-		do (a = !a) ? s += t : s -= t, t *= xx, t /= ++n, t /= ++n;
+		do s += t, t *= xx, t /= ++n, t /= ++n;
 		while (t);
 		return s;
 	}
@@ -338,11 +337,10 @@ namespace maths
 	/// In a right triangle, the leg adjacent an angle over the hypotenuse
 	template <typename float_t> float_t cos(float_t x)
 	{
-		bool a = false;
 		uintmax_t n = 0;
-		const float_t xx = x*x;
+		const float_t xx = -x*x;
 		float_t s = 0, t = 1;
-		do (a = !a) ? s += t : s -= t, t *= xx, t /= ++n, t /= ++n;
+		do s += t, t *= xx, t /= ++n, t /= ++n;
 		while (t);
 		return s;
 	}
@@ -354,7 +352,7 @@ namespace maths
 
 	template <typename float_t> float_t asin(float_t x)
 	{
-		return x*hyper(0.5, 0.5, 1.5, x*x);
+		return x*hyper<float_t>(0.5, 0.5, 1.5, x*x);
 	}
 
 	template <typename float_t> float_t acos(float_t x)
@@ -364,7 +362,7 @@ namespace maths
 
 	template <typename float_t> float_t atan(float_t x)
 	{
-		return x*hyper(0.5, 1.0, 1.5, -x*x);
+		return x*hyper<float_t>(0.5, 1.0, 1.5, -x*x);
 	}
 
 	template <typename float_t> inline float_t atan2(float_t y, float_t x)
@@ -397,19 +395,19 @@ namespace maths
 		return sinh(x)/cosh(x);
 	}
 
-	template <typename float_t> inline float_t asinh(float_t x)
+	template <typename float_t> float_t asinh(float_t x)
 	{
-		return std::asinh(x);
+		return ln(x + std::sqrt(x*x + 1));
 	}
 
-	template <typename float_t> inline float_t acosh(float_t x)
+	template <typename float_t> float_t acosh(float_t x)
 	{
-		return std::acosh(x);
+		return ln(x + std::sqrt(x*x - 1));
 	}
 
-	template <typename float_t> inline float_t atanh(float_t x)
+	template <typename float_t> float_t atanh(float_t x)
 	{
-		return std::atanh(x);
+		return x*hyper<float_t>(0.5, 1.0, 1.5, x*x);
 	}
 	
 }; // namespace maths
