@@ -272,7 +272,7 @@ namespace maths
 	/// The number 2 raised to the exponent x
 	template <typename float_t> float_t exp2(float_t x)
 	{
-		return std::exp2(x);
+		return exp(x*ln2);
 	}
 
 	/// The natural logarithm of x, so exp(ln(x)) = x
@@ -410,13 +410,13 @@ namespace maths
 	/// The angle with a hyperbolic sine of x
 	template <typename float_t> float_t asinh(float_t x)
 	{
-		return ln(x + std::sqrt(x*x + 1));
+		return ln(x + sqrt(x*x + 1));
 	}
 
 	/// The angle with a hyperbolic cosine of x
 	template <typename float_t> float_t acosh(float_t x)
 	{
-		return ln(x + std::sqrt(x*x - 1));
+		return ln(x + sqrt(x*x - 1));
 	}
 
 	/// The angle with a hyperbolic tangent of x

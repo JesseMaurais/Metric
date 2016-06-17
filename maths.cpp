@@ -52,7 +52,7 @@ extern "C" int luaopen_maths(lua_State *state)
 	{"cbrt", lux_cast(cbrt<lua_Number>)},
 	// exponential & logarithmic
 	{"exp", lux_cast(exp<lua_Number>)},
-	{"exp2", lux_cast(exp<lua_Number>)},
+	{"exp2", lux_cast(exp2<lua_Number>)},
 	{"ln", lux_cast(ln<lua_Number>)},
 	{"log", lux_cast(log<lua_Number>)},
 	{"log2", lux_cast(log2<lua_Number>)},
