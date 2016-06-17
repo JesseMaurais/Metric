@@ -258,24 +258,6 @@ namespace maths
 	{
 		return 1.0 - erfc(x);
 	}
-	
-	/// The power of x raised to the exponent p
-	template <typename float_t> float_t pow(float_t x, float_t p)
-	{
-		return std::pow(x, p);
-	}
-
-	/// The square root of x for real x >= 0
-	template <typename float_t> float_t sqrt(float_t x)
-	{
-		return std::sqrt(x);
-	}
-
-	/// The cube root of x for real x
-	template <typename float_t> float_t cbrt(float_t x)
-	{
-		return std::cbrt(x);
-	}
 
 	/// Euler's number raised to the exponent x
 	template <typename float_t> float_t exp(float_t x)
@@ -322,6 +304,24 @@ namespace maths
 	{
 		return ln(x)/ln10;
 	}	
+	
+	/// The power of x raised to the exponent p
+	template <typename float_t> float_t pow(float_t x, float_t p)
+	{
+		return exp(ln(x)*p);
+	}
+
+	/// The square root of x for real x >= 0
+	template <typename float_t> float_t sqrt(float_t x)
+	{
+		return exp(ln(x)/2);
+	}
+
+	/// The cube root of x for real x
+	template <typename float_t> float_t cbrt(float_t x)
+	{
+		return exp(ln(x)/3);
+	}
 
 	/// In a right triangle, the leg opposite an angle over the hypotenuse
 	template <typename float_t> float_t sin(float_t x)
