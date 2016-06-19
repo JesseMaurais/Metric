@@ -15,6 +15,7 @@
 #include <array>
 #include <limits>
 #include <cstdint>
+#include <string>
 
 namespace arith
 {
@@ -29,6 +30,7 @@ namespace arith
 
 	public:
 
+		// Column style addition, digit-by-digit
 		integer operator+=(const integer &that)
 		{
 			int carry = 0;
@@ -46,6 +48,7 @@ namespace arith
 			return *this;
 		}
 
+		// Classical "long" multiplication
 		integer operator*=(const integer &that)
 		{
 			int carry = 0;
@@ -69,7 +72,27 @@ namespace arith
 			return *this;
 		}
 
-		
+		// Convert from a decimal number in a string
+		integer operator=(const std::string &string)
+		{
+			size_t dig = 0, dec = 1, n = string.size();
+			int carry = 0;
+			while (--n and dig < size) {
+				carry += dec * std::stoi(string[n]);
+				if (max < carry) {
+					auto div = std::div(carry, max);
+					digits[dig++] = div.rem;
+					carry = div.quot;
+				}
+				dec *= 10;
+			}
+		}
+
+		// Convert from a true integer
+		integer operator=(int value)
+		{
+			// should be easy
+		}
 	};
 
 }; // namespace arith
