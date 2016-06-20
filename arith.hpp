@@ -23,8 +23,8 @@ namespace arith
 	{
 		// Use bytes as digits
 		using base = uint8_t;
-		// We need the upper limit for the base type for digits
-		constexpr size_t max = std::numeric_limits<base>::max();
+		// We need the upper limit of the base type for our digits
+		static constexpr size_t max = std::numeric_limits<base>::max();
 		// Store digits in an array
 		std::array<base, size> digits;
 
@@ -65,8 +65,8 @@ namespace arith
 					carry = 0;
 				}
 			 }
-			 sums[size + i] += carry;
 			 digits[i] = sums[i];
+			 sums[size + i] += carry;
 			 carry = 0;
 			}
 			return *this;
@@ -75,28 +75,29 @@ namespace arith
 		// Convert from a decimal number in a string
 		integer operator=(const std::string &string)
 		{
-			size_t dig = 0, dec = 1, n = string.size();
-			int carry = 0;
-			while (--n and dig < size) {
-				carry += dec * std::stoi(string[n]);
+			size_t carry = 0, dec = 1, dig = 0, n = string.size();
+			while (n-- and dig < size) {
+				carry += dec * std::stoi(string.substr(n, 1));
 				if (max < carry) {
-					auto div = std::div(carry, max);
+					auto div = std::div((int) carry, max);
 					digits[dig++] = div.rem;
 					carry = div.quot;
 				}
 				dec *= 10;
 			}
+			return *this;
 		}
 
 		// Convert from a true integer
-		integer operator=(int value)
+		integer operator=(intmax_t value)
 		{
-			size_t dig = 0;
+			int dig = 0;
 			while (value) {
 				auto div = std::div(value, max);
 				digits[dig++] = div.rem;
 				value = div.quot;
 			}
+			return *this;
 		}
 	};
 
