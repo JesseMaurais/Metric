@@ -61,7 +61,7 @@ namespace arith
 					sums[i + j] += div.rem;
 					carry = div.quot;
 				} else {
-					sums[i + j] = num;
+					sums[i + j] += num;
 					carry = 0;
 				}
 			 }
@@ -91,7 +91,12 @@ namespace arith
 		// Convert from a true integer
 		integer operator=(int value)
 		{
-			// should be easy
+			size_t dig = 0;
+			while (value) {
+				auto div = std::div(value, max);
+				digits[dig++] = div.rem;
+				value = div.quot;
+			}
 		}
 	};
 
