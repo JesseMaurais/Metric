@@ -19,12 +19,13 @@
 
 namespace arith
 {
+	/// Perhaps it should be "natural"
 	template <size_t size> class integer
 	{
 		// Use bytes as digits
 		using base = uint8_t;
 		// We need the upper limit of the base type for our digits
-		static constexpr size_t max = std::numeric_limits<base>::max();
+		static constexpr int max = std::numeric_limits<base>::max();
 		// Store digits in an array
 		std::array<base, size> digits;
 
@@ -75,11 +76,12 @@ namespace arith
 		// Convert from a decimal number in a string
 		integer operator=(const std::string &string)
 		{
-			size_t carry = 0, dec = 1, dig = 0, n = string.size();
+			int carry = 0, dec = 1;
+			size_t dig = 0, n = string.size();
 			while (n-- and dig < size) {
 				carry += dec * std::stoi(string.substr(n, 1));
 				if (max < carry) {
-					auto div = std::div((int) carry, max);
+					auto div = std::div(carry, max);
 					digits[dig++] = div.rem;
 					carry = div.quot;
 				}
@@ -89,7 +91,7 @@ namespace arith
 		}
 
 		// Convert from a true integer
-		integer operator=(intmax_t value)
+		integer operator=(int value)
 		{
 			int dig = 0;
 			while (value) {
@@ -98,6 +100,19 @@ namespace arith
 				value = div.quot;
 			}
 			return *this;
+		}
+
+		// Convert to a true integer
+		operator int() const
+		{
+			size_t dig = 0;
+			int value = 0, dec = 1;
+			while (dig < size) {
+				value += dec * digits[dig];
+				dec *= max;
+				++dig;
+			}
+			return value;
 		}
 	};
 
