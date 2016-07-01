@@ -19,7 +19,6 @@
 
 namespace arith
 {
-	/// Perhaps it should be "natural"
 	template <size_t size> class integer
 	{
 		// Use bytes as digits
@@ -96,8 +95,9 @@ namespace arith
 			int dig = 0;
 			while (value) {
 				auto div = std::div(value, max);
-				digits[dig++] = div.rem;
+				digits[dig] = div.rem;
 				value = div.quot;
+				++dig;
 			}
 			return *this;
 		}
@@ -113,6 +113,11 @@ namespace arith
 				++dig;
 			}
 			return value;
+		}
+
+		integer()
+		{
+			digits.fill(0);
 		}
 	};
 
