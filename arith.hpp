@@ -48,6 +48,22 @@ namespace arith
 			return *this;
 		}
 
+		// Similar to above but for subtraction
+		integer operator-=(const integer &that)
+		{
+			int carry = 0;
+			for (int i = 0; i < size; ++i) {
+				int num = digits[i] - that.digits[i] - carry;
+				carry = 0;
+				while (num < 0) {
+					num += max;
+					++carry;
+				}
+				digits[i] = num;
+			}
+			return *this;
+		}
+
 		// Classical "long" multiplication
 		integer operator*=(const integer &that)
 		{
@@ -72,17 +88,45 @@ namespace arith
 			return *this;
 		}
 
+		// Prefix increment
+		integer operator++()
+		{
+			for (int i = 0; i < size; ++i) {
+				if (digits[i] < max) {
+					++digits[i];
+					break;
+				}
+				digits[i] = 0;
+			}
+			return *this;
+		}
+
+		// Prefix decrement
+		integer operator--()
+		{
+			for (int i = 0; i < size; ++i) {
+				if (0 < digits[i]) {
+					--digits[i];
+					break;
+				}
+				digits[i] = max;
+			}
+			return *this;
+		}
+
 		// Convert from a decimal number in a string
 		integer operator=(const std::string &string)
 		{
 			int carry = 0, dec = 1;
 			size_t dig = 0, n = string.size();
 			while (n-- and dig < size) {
-				carry += dec * std::stoi(string.substr(n, 1));
+				int num = std::stoi(string.substr(n, 1));
+				carry += dec * num;
 				if (max < carry) {
 					auto div = std::div(carry, max);
-					digits[dig++] = div.rem;
+					digits[dig] = div.rem;
 					carry = div.quot;
+					++dig;
 				}
 				dec *= 10;
 			}
@@ -118,6 +162,11 @@ namespace arith
 		integer()
 		{
 			digits.fill(0);
+		}
+
+		inline void swap(integer &that)
+		{
+			std::swap(digits, that.digits);
 		}
 	};
 
