@@ -12,16 +12,17 @@
  * and the array size gives the precision of the integer.
  */
 
-#include <array>
-#include <limits>
-#include <cstdint>
-#include <string>
+#include <array>	// std::array
+#include <vector>	// std::vector
+#include <limits>	// std::numeric_limits
+#include <string>	// std::string
+#include <cstring>	// memmove, memset
+#include <cstdint>	// uint8_t
 
 namespace arith
 {
 	template <size_t size> class integer
 	{
-		// Use bytes as digits
 		using base = uint8_t;
 		// We need the upper limit of the base type for our digits
 		static constexpr int max = std::numeric_limits<base>::max();
@@ -30,7 +31,6 @@ namespace arith
 
 	public:
 
-		// Column style addition, digit-by-digit
 		integer operator+=(const integer &that)
 		{
 			int carry = 0;
@@ -48,7 +48,6 @@ namespace arith
 			return *this;
 		}
 
-		// Similar to above but for subtraction
 		integer operator-=(const integer &that)
 		{
 			int carry = 0;
@@ -64,7 +63,6 @@ namespace arith
 			return *this;
 		}
 
-		// Classical "long" multiplication
 		integer operator*=(const integer &that)
 		{
 			int carry = 0;
@@ -88,33 +86,114 @@ namespace arith
 			return *this;
 		}
 
-		// Prefix increment
+		integer operator/=(const integer &that)
+		{
+			integer quot;
+			while (*this >= that) {
+				*this -= that;
+				++quot;
+			}
+			swap(quot);
+			return *this;
+		}
+
+		integer operator%=(const integer &that)
+		{
+			while (*this >= that) {
+				*this -= that;
+			}
+			return *this;
+		}
+
 		integer operator++()
 		{
-			for (int i = 0; i < size; ++i) {
-				if (digits[i] < max) {
-					++digits[i];
+			for (auto &d : digits) {
+				if (d < max) {
+					++d;
 					break;
 				}
-				digits[i] = 0;
+				d = 0;
 			}
 			return *this;
 		}
 
-		// Prefix decrement
 		integer operator--()
 		{
-			for (int i = 0; i < size; ++i) {
-				if (0 < digits[i]) {
-					--digits[i];
+			for (auto &d : digits) {
+				if (0 < d) {
+					--d;
 					break;
 				}
-				digits[i] = max;
+				d = max;
 			}
 			return *this;
 		}
 
-		// Convert from a decimal number in a string
+		integer operator<<=(int delta)
+		{
+			// Find whole and partial move
+			auto div = std::div(delta, max);
+			if (div.quot) {
+				// Move whole bytes
+				base *ptr = digits.data();
+				size_t range = size - div.quot;
+				size_t bytes = range * sizeof(base);
+				std::memmove(ptr + div.quot, ptr, bytes);
+				std::memset(ptr, base(0), div.quot);
+			}
+			if (div.rem) {
+				// Move partial bits
+				const base mask = ~base(0) << div.rem;
+				base carry = 0;
+				for (int i = div.quot; i < size; ++i) {
+					base bits = carry >> div.rem;
+					carry = digits[i] bitand mask;
+					digits[i] <<= div.rem;
+					digits[i] |= bits; 
+				}
+			}
+			return *this;
+		}
+
+		integer operator>>=(int delta)
+		{
+			// Find whole and partial move
+			auto div = std::div(delta, max);
+			size_t range = size - div.quot;
+			if (div.quot) {
+				// Move whole bytes
+				base *ptr = digits.data();
+				size_t bytes = range * sizeof(base);
+				std::memmove(ptr, ptr + div.quot, bytes);
+				std::memset(ptr + range, base(0), div.quot);
+			}
+			if (div.rem) {
+				// Move partial bits
+				const base mask = ~base(0) >> div.rem;
+				base carry = 0;
+				for (int i = range - 1; i > -1; --i) {
+					base bits = carry << div.rem;
+					carry = digits[i] bitand mask;
+					digits[i] >>= div.rem;
+					digits[i] |= bits;
+				} 
+			}
+			return *this;
+		}
+
+		bool operator==(const integer &that)
+		{
+			return digits == that.digits;
+		}
+
+		bool operator<(const integer &that)
+		{
+			return std::lexicographical_compare(
+				digits.rbegin(), digits.rend(),
+				that.digits.rbegin(), that.digits.rend()
+				);
+		}
+
 		integer operator=(const std::string &string)
 		{
 			int carry = 0, dec = 1;
@@ -133,7 +212,6 @@ namespace arith
 			return *this;
 		}
 
-		// Convert from a true integer
 		integer operator=(int value)
 		{
 			int dig = 0;
@@ -146,7 +224,11 @@ namespace arith
 			return *this;
 		}
 
-		// Convert to a true integer
+		operator std::string() const
+		{
+			return "0";
+		}
+
 		operator int() const
 		{
 			size_t dig = 0;
@@ -169,6 +251,45 @@ namespace arith
 			std::swap(digits, that.digits);
 		}
 	};
+
+	
+	template <> class integer<0>
+	{
+		using base = uint8_t;
+		// We need the upper limit of the base type for our digits
+		static constexpr int max = std::numeric_limits<base>::max();
+		// Store digits in a vector
+		std::vector<base> digits;
+
+	public:
+
+		integer operator++()
+		{
+			for (auto &d : digits) {
+				if (d < max) {
+				 ++d;
+				 return *this;
+				}
+				d = 0;
+			}
+			digits.push_back(1);
+			return *this;
+		}
+
+		integer operator--()
+		{
+			for (auto &d : digits) {
+				if (0 < d) {
+				 ++d;
+				 return *this;
+				}
+				d = 0;
+			}
+			digits.push_back(1);
+			return *this;
+		}
+	};
+
 
 }; // namespace arith
 
