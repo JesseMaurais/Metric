@@ -16,11 +16,87 @@
 #include <vector>	// std::vector
 #include <limits>	// std::numeric_limits
 #include <string>	// std::string
+#include <utility>	// std::rel_ops
 #include <cstring>	// memmove, memset
 #include <cstdint>	// uint8_t
 
 namespace arith
 {
+	template <typename number> inline
+	number operator+(const number &a, const number &b)
+	{
+		number c = a;
+		c += b;
+		return c;
+	}
+
+	template <typename number> inline
+	number operator-(const number &a, const number &b)
+	{
+		number c = a;
+		c -= b;
+		return c;
+	}
+
+	template <typename number> inline
+	number operator*(const number &a, const number &b)
+	{
+		number c = a;
+		c *= b;
+		return c;
+	}
+
+	template <typename number> inline
+	number operator/(const number &a, const number &b)
+	{
+		number c = a;
+		c /= b;
+		return c;
+	}
+
+	template <typename number> inline
+	number operator%(const number &a, const number &b)
+	{
+		number c = a;
+		c %= b;
+		return c;
+	}
+
+	template <typename number> inline
+	number operator++(number &a, int postfix)
+	{
+		number b = a;
+		--a;
+		return b;
+	}
+
+	template <typename number> inline
+	number operator--(number &a, int postfix)
+	{
+		number b = a;
+		--a;
+		return b;
+	}
+
+	template <typename number> inline
+	number operator<<(const number &a, int delta)
+	{
+		number b = a;
+		b <<= delta;
+		return b;
+	}
+
+	template <typename number> inline
+	number operator>>(const number &a, int delta)
+	{
+		number b = a;
+		b >>= delta;
+		return b;
+	}
+	
+	using namespace std::rel_ops;
+
+
 	template <size_t size> class integer
 	{
 		using base = uint8_t;
@@ -34,7 +110,7 @@ namespace arith
 		integer operator+=(const integer &that)
 		{
 			int carry = 0;
-			for (int i = 0; i < size; ++i) {
+			for (size_t i = 0; i < size; ++i) {
 				int num = digits[i] + that.digits[i] + carry;
 				if (max < num) {
 					auto div = std::div(num, max);
@@ -51,7 +127,7 @@ namespace arith
 		integer operator-=(const integer &that)
 		{
 			int carry = 0;
-			for (int i = 0; i < size; ++i) {
+			for (size_t i = 0; i < size; ++i) {
 				int num = digits[i] - that.digits[i] - carry;
 				carry = 0;
 				while (num < 0) {
@@ -67,8 +143,8 @@ namespace arith
 		{
 			int carry = 0;
 			int sums[size*2] = {0};
-			for (int i = 0; i < size; ++i) {
-			 for (int j = 0; j < size; ++j) {
+			for (size_t i = 0; i < size; ++i) {
+			 for (size_t j = 0; j < size; ++j) {
 				int num = digits[i] * that.digits[j] + carry;
 				if (max < num) {
 					auto div = std::div(num, max);
@@ -145,7 +221,7 @@ namespace arith
 				// Move partial bits
 				const base mask = ~base(0) << div.rem;
 				base carry = 0;
-				for (int i = div.quot; i < size; ++i) {
+				for (size_t i = div.quot; i < size; ++i) {
 					base bits = carry >> div.rem;
 					carry = digits[i] bitand mask;
 					digits[i] <<= div.rem;
@@ -171,7 +247,7 @@ namespace arith
 				// Move partial bits
 				const base mask = ~base(0) >> div.rem;
 				base carry = 0;
-				for (int i = range - 1; i > -1; --i) {
+				for (size_t i = range - 1; i > -1; --i) {
 					base bits = carry << div.rem;
 					carry = digits[i] bitand mask;
 					digits[i] >>= div.rem;
@@ -188,55 +264,72 @@ namespace arith
 
 		bool operator<(const integer &that)
 		{
-			return std::lexicographical_compare(
-				digits.rbegin(), digits.rend(),
-				that.digits.rbegin(), that.digits.rend()
-				);
+			bool equal = true;
+			for (size_t i = 0; i < size; ++i) {
+				if (digits[i] > that.digits[i]) {
+					return false;
+				}
+				if (digits[i] < that.digits[i]) {
+					equal = false;
+				}
+			}
+			return !equal;
 		}
 
 		integer operator=(const std::string &string)
 		{
-			int carry = 0, dec = 1;
-			size_t dig = 0, n = string.size();
-			while (n-- and dig < size) {
-				int num = std::stoi(string.substr(n, 1));
-				carry += dec * num;
+			int carry = 0, order = 1, index = 0;
+			for (const auto ch : string) {
+				int num = ch - '0';
+				carry += order * num;
 				if (max < carry) {
 					auto div = std::div(carry, max);
-					digits[dig] = div.rem;
+					digits[index] = div.rem;
 					carry = div.quot;
-					++dig;
+					++index;
 				}
-				dec *= 10;
+				order *= 10;
 			}
 			return *this;
 		}
 
 		integer operator=(int value)
 		{
-			int dig = 0;
+			int index = 0;
 			while (value) {
 				auto div = std::div(value, max);
-				digits[dig] = div.rem;
+				digits[index] = div.rem;
 				value = div.quot;
-				++dig;
+				++index;
 			}
 			return *this;
 		}
 
 		operator std::string() const
 		{
-			return "0";
+			std::string string;
+			int carry = 0;
+			size_t index = size;
+			for (size_t i = 0; i < size; ++i) {
+				base dig = digits[--index];
+				do {
+					auto div = std::div(dig, 10);
+					string += '0' + div.rem;
+					dig = div.quot;
+				}
+				while (dig);
+			}
+			return string;
 		}
 
 		operator int() const
 		{
-			size_t dig = 0;
-			int value = 0, dec = 1;
-			while (dig < size) {
-				value += dec * digits[dig];
-				dec *= max;
-				++dig;
+			size_t index = 0;
+			int value = 0, order = 1;
+			while (index < size) {
+				value += order * digits[index];
+				order *= max;
+				++index;
 			}
 			return value;
 		}
@@ -244,6 +337,16 @@ namespace arith
 		integer()
 		{
 			digits.fill(0);
+		}
+
+		integer(int value)
+		{
+			*this = value;
+		}
+
+		integer(const std::string &string)
+		{
+			*this = string;
 		}
 
 		inline void swap(integer &that)
@@ -265,12 +368,12 @@ namespace arith
 
 		integer operator++()
 		{
-			for (auto &d : digits) {
-				if (d < max) {
-				 ++d;
+			for (auto &dig : digits) {
+				if (dig < max) {
+				 ++dig;
 				 return *this;
 				}
-				d = 0;
+				dig = 0;
 			}
 			digits.push_back(1);
 			return *this;
@@ -278,12 +381,12 @@ namespace arith
 
 		integer operator--()
 		{
-			for (auto &d : digits) {
-				if (0 < d) {
-				 ++d;
+			for (auto &dig : digits) {
+				if (0 < dig) {
+				 ++dig;
 				 return *this;
 				}
-				d = 0;
+				dig = 0;
 			}
 			digits.push_back(1);
 			return *this;
