@@ -20,7 +20,7 @@
 #include <cstring>	// memmove, memset
 #include <cstdint>	// uint8_t
 
-namespace arith
+namespace arithmetic
 {
 	template <typename number> inline
 	number operator+(const number &a, const number &b)
@@ -66,7 +66,7 @@ namespace arith
 	number operator++(number &a, int postfix)
 	{
 		number b = a;
-		--a;
+		++a;
 		return b;
 	}
 
@@ -100,9 +100,8 @@ namespace arith
 	template <size_t size> class integer
 	{
 		using base = uint8_t;
-		// We need the upper limit of the base type for our digits
 		static constexpr int max = std::numeric_limits<base>::max();
-		// Store digits in an array
+		static constexpr int digindec = 3; // ceil(log10(max))
 		std::array<base, size> digits;
 
 	public:
@@ -223,7 +222,7 @@ namespace arith
 				base carry = 0;
 				for (size_t i = div.quot; i < size; ++i) {
 					base bits = carry >> div.rem;
-					carry = digits[i] bitand mask;
+					carry = digits[i] & mask;
 					digits[i] <<= div.rem;
 					digits[i] |= bits; 
 				}
@@ -308,16 +307,15 @@ namespace arith
 		operator std::string() const
 		{
 			std::string string;
-			int carry = 0;
-			size_t index = size;
-			for (size_t i = 0; i < size; ++i) {
+			for (size_t index = size, i = 0; i < size; ++i) {
 				base dig = digits[--index];
-				do {
+				char dec[digindec] = {'0'};
+				for (size_t j = 0; dig; ++j) {
 					auto div = std::div(dig, 10);
-					string += '0' + div.rem;
+					dec[j] += div.rem;
 					dig = div.quot;
 				}
-				while (dig);
+				string += dec;
 			}
 			return string;
 		}
@@ -341,11 +339,13 @@ namespace arith
 
 		integer(int value)
 		{
+			digits.fill(0);
 			*this = value;
 		}
 
 		integer(const std::string &string)
 		{
+			digits.fill(0);
 			*this = string;
 		}
 
@@ -355,46 +355,7 @@ namespace arith
 		}
 	};
 
-	
-	template <> class integer<0>
-	{
-		using base = uint8_t;
-		// We need the upper limit of the base type for our digits
-		static constexpr int max = std::numeric_limits<base>::max();
-		// Store digits in a vector
-		std::vector<base> digits;
-
-	public:
-
-		integer operator++()
-		{
-			for (auto &dig : digits) {
-				if (dig < max) {
-				 ++dig;
-				 return *this;
-				}
-				dig = 0;
-			}
-			digits.push_back(1);
-			return *this;
-		}
-
-		integer operator--()
-		{
-			for (auto &dig : digits) {
-				if (0 < dig) {
-				 ++dig;
-				 return *this;
-				}
-				dig = 0;
-			}
-			digits.push_back(1);
-			return *this;
-		}
-	};
-
-
-}; // namespace arith
+}; // namespace arithmetic
 
 #endif // Metric_arith
 

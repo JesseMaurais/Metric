@@ -3,12 +3,17 @@
 
 template <size_t size> struct lux_Integer
 {
-	typedef arith::integer<size> User;
+	typedef arithmetic::integer<size> User;
 	typedef lux_Store<User> Type;
 
 	static int __tostring(lua_State *state)
 	{
 		return lux_push<std::string>(state, Type::to(state));
+	}
+
+	static int __call(lua_State *state)
+	{
+		return lux_push<lua_Integer>(state, Type::to(state));
 	}
 
 	static int __new(lua_State *state)
@@ -106,6 +111,7 @@ template <size_t size> struct lux_Integer
 		luaL_Reg regs[] = 
 		{
 		{"__tostring", __tostring},
+		{"__call", __call},
 		{"__add", __add},
 		{"__sub", __sub},
 		{"__mul", __mul},
