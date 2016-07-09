@@ -3,52 +3,52 @@
 
 /**
  * This is an R-like interface for calculating probabilities and densities/mass
- * for the common random variable distributions. Like maths.hpp this is more to
- * test myself at numerical and statistical computing than it is intended for a
- * high-performance computing. 
+ * for the common random variable distributions. Like numeric.hpp this is more
+ * to test myself at numerical and statistical computing than it is intended
+ * for a high-performance computing library.
  */
 
-#include "maths.hpp"
+#include "numeric.hpp"
 
-namespace stats
+namespace statistics
 {
 	// Normal distribution
 
 	template <typename float_t> float_t dnorm(float_t x, float_t mu=0, float_t sigma=1)
 	{
 		float_t z = (x -  mu)/sigma;
-		return maths::exp(-z*z/2)/maths::sqrt2pi/sigma;
+		return numeric::exp(-z*z/2)/numeric::sqrt2pi/sigma;
 	}
 
 	template <typename float_t> float_t pnorm(float_t x, float_t mu=0, float_t sigma=1)
 	{
 		float_t z = (x - mu)/sigma;
-		return (1 + maths::erf(z/maths::sqrt2))/2/sigma;
+		return (1 + numeric::erf(z/numeric::sqrt2))/2/sigma;
 	}
 
 	// Gamma distribution
 
 	template <typename float_t> float_t dgamma(float_t x, float_t a, float_t b)
 	{
-		float_t unity = maths::pow(b, a)/maths::tgamma(a);
-		return maths::pow(x, a - 1)*maths::exp(-x*b)*unity;
+		float_t unity = numeric::pow(b, a)/numeric::tgamma(a);
+		return numeric::pow(x, a - 1)*numeric::exp(-x*b)*unity;
 	}
 
 	template <typename float_t> float_t pgamma(float_t x, float_t a, float_t b)
 	{
-		return maths::igamma(a, x*b)/maths::tgamma(a);
+		return numeric::igamma(a, x*b)/numeric::tgamma(a);
 	}
 
 	// Exponential distribution
 
 	template <typename float_t> float_t dexp(float_t x, float_t mu=1)
 	{
-		return maths::exp(-x/mu)/mu;
+		return numeric::exp(-x/mu)/mu;
 	}
 
 	template <typename float_t> float_t pexp(float_t x, float_t mu=1)
 	{
-		return 1 - maths::exp(-x/mu);
+		return 1 - numeric::exp(-x/mu);
 	}
 
 	// Chi-squared distribution
@@ -67,12 +67,12 @@ namespace stats
 
 	template <typename float_t> float_t dbeta(float_t x, float_t a, float_t b)
 	{
-		return maths::pow(x, a-1)*maths::pow(1-x, b-1)/maths::beta(a,b);
+		return numeric::pow(x, a-1)*numeric::pow(1-x, b-1)/numeric::beta(a,b);
 	}
 
 	template <typename float_t> float_t pbeta(float_t x, float_t a, float_t b)
 	{
-		return maths::ibeta(a, b, x)/maths::beta(a, b);
+		return numeric::ibeta(a, b, x)/numeric::beta(a, b);
 	}
 
 	// Fisher distribution
@@ -80,9 +80,9 @@ namespace stats
 	template <typename float_t> float_t df(float_t x, float_t num, float_t den)
 	{
 		float_t y = x*num/den;
-		float_t p = maths::pow(y, num/2);
-		float_t q = maths::pow(1 + y, -(num + den)/2);
-		return p*q/maths::beta(num/2, den/2)/(x?x:1);
+		float_t p = numeric::pow(y, num/2);
+		float_t q = numeric::pow(1 + y, -(num + den)/2);
+		return p*q/numeric::beta(num/2, den/2)/(x?x:1);
 	}
 
 	template <typename float_t> float_t pf(float_t x, float_t num, float_t den)
@@ -90,7 +90,7 @@ namespace stats
 		return 1 - pbeta(num/(den + num*x), den/2, num/2);
 	}
 
-}; // namespace stats
+}; // namespace statistics
 
-#endif // Metric_stats
+#endif // Metric_statistics
 

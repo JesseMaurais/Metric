@@ -35,7 +35,7 @@
 #include <utility>
 #include <cmath>
 
-namespace maths
+namespace numeric
 {
 	// These are not always defined in cmath nor with 128 bit precision
 	constexpr auto e       = 2.718281828459045235360287471352662498L;

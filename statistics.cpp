@@ -1,9 +1,9 @@
-#include "stats.hpp"
+#include "statistics.hpp"
 #include <lux/lux.hpp>
 
-extern "C" int luaopen_stats(lua_State *state)
+extern "C" int luaopen_statistics(lua_State *state)
 {
-	using namespace stats;
+	using namespace statistics;
 	luaL_Reg regs[] =
 	{
 	// normal

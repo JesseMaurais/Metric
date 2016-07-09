@@ -13,53 +13,44 @@
  */
 
 #include <array>	// std::array
-#include <vector>	// std::vector
 #include <limits>	// std::numeric_limits
-#include <string>	// std::string
+#include <string>	// std::string, std::to_string
 #include <utility>	// std::rel_ops
-#include <cstring>	// memmove, memset
+#include <algorithm>	// std::reverse, std::all_of
+#include <stdexcept>	// std::overflow_error, std::underflow_error
+#include <cinttypes>	// imaxdiv
 #include <cstdint>	// uint8_t
 
 namespace arithmetic
 {
 	template <typename number> inline
-	number operator+(const number &a, const number &b)
+	number operator+(number a, const number &b)
 	{
-		number c = a;
-		c += b;
-		return c;
+		return a += b;
 	}
 
 	template <typename number> inline
-	number operator-(const number &a, const number &b)
+	number operator-(number a, const number &b)
 	{
-		number c = a;
-		c -= b;
-		return c;
+		return a -= b;
 	}
 
 	template <typename number> inline
-	number operator*(const number &a, const number &b)
+	number operator*(number a, const number &b)
 	{
-		number c = a;
-		c *= b;
-		return c;
+		return a *= b;
 	}
 
 	template <typename number> inline
-	number operator/(const number &a, const number &b)
+	number operator/(number a, const number &b)
 	{
-		number c = a;
-		c /= b;
-		return c;
+		return a /= b;
 	}
 
 	template <typename number> inline
-	number operator%(const number &a, const number &b)
+	number operator%(number a, const number &b)
 	{
-		number c = a;
-		c %= b;
-		return c;
+		return a %= b;
 	}
 
 	template <typename number> inline
@@ -79,19 +70,15 @@ namespace arithmetic
 	}
 
 	template <typename number> inline
-	number operator<<(const number &a, int delta)
+	number operator<<(number a, unsigned b)
 	{
-		number b = a;
-		b <<= delta;
-		return b;
+		return a <<= b;
 	}
 
 	template <typename number> inline
-	number operator>>(const number &a, int delta)
+	number operator>>(number a, unsigned b)
 	{
-		number b = a;
-		b >>= delta;
-		return b;
+		return a >>= b;
 	}
 	
 	using namespace std::rel_ops;
@@ -100,19 +87,25 @@ namespace arithmetic
 	template <size_t size> class integer
 	{
 		using base = uint8_t;
-		static constexpr int max = std::numeric_limits<base>::max();
-		static constexpr int digindec = 3; // ceil(log10(max))
+		using int_t = intmax_t;
+		using uint_t = uintmax_t;
+
+		using overflow = std::overflow_error;
+		using underflow = std::underflow_error;
+
+		static constexpr uint_t max = std::numeric_limits<base>::max();
+
 		std::array<base, size> digits;
 
 	public:
 
 		integer operator+=(const integer &that)
 		{
-			int carry = 0;
+			uint_t carry = 0;
 			for (size_t i = 0; i < size; ++i) {
-				int num = digits[i] + that.digits[i] + carry;
+				uint_t num = digits[i] + that.digits[i] + carry;
 				if (max < num) {
-					auto div = std::div(num, max);
+					auto div = std::imaxdiv(num, max);
 					digits[i] = div.rem;
 					carry = div.quot;	
 				} else {
@@ -120,14 +113,17 @@ namespace arithmetic
 					carry = 0;
 				}
 			}
+			if (carry) {
+				throw overflow("+");
+			}
 			return *this;
 		}
 
 		integer operator-=(const integer &that)
 		{
-			int carry = 0;
+			uint_t carry = 0;
 			for (size_t i = 0; i < size; ++i) {
-				int num = digits[i] - that.digits[i] - carry;
+				int_t num = digits[i] - that.digits[i] - carry;
 				carry = 0;
 				while (num < 0) {
 					num += max;
@@ -135,18 +131,21 @@ namespace arithmetic
 				}
 				digits[i] = num;
 			}
+			if (carry) {
+				throw underflow("-");
+			}
 			return *this;
 		}
 
 		integer operator*=(const integer &that)
 		{
-			int carry = 0;
-			int sums[size*2] = {0};
+			uint_t carry = 0;
+			uint_t sums[size*2] = {0};
 			for (size_t i = 0; i < size; ++i) {
 			 for (size_t j = 0; j < size; ++j) {
-				int num = digits[i] * that.digits[j] + carry;
+				uint_t num = digits[i] * that.digits[j] + carry;
 				if (max < num) {
-					auto div = std::div(num, max);
+					auto div = std::imaxdiv(num, max);
 					sums[i + j] += div.rem;
 					carry = div.quot;
 				} else {
@@ -182,76 +181,24 @@ namespace arithmetic
 
 		integer operator++()
 		{
-			for (auto &d : digits) {
-				if (d < max) {
-					++d;
+			for (base &dig : digits) {
+				if (dig < max) {
+					++dig;
 					break;
 				}
-				d = 0;
+				dig = 0;
 			}
 			return *this;
 		}
 
 		integer operator--()
 		{
-			for (auto &d : digits) {
-				if (0 < d) {
-					--d;
+			for (base &dig : digits) {
+				if (0 < dig) {
+					--dig;
 					break;
 				}
-				d = max;
-			}
-			return *this;
-		}
-
-		integer operator<<=(int delta)
-		{
-			// Find whole and partial move
-			auto div = std::div(delta, max);
-			if (div.quot) {
-				// Move whole bytes
-				base *ptr = digits.data();
-				size_t range = size - div.quot;
-				size_t bytes = range * sizeof(base);
-				std::memmove(ptr + div.quot, ptr, bytes);
-				std::memset(ptr, base(0), div.quot);
-			}
-			if (div.rem) {
-				// Move partial bits
-				const base mask = ~base(0) << div.rem;
-				base carry = 0;
-				for (size_t i = div.quot; i < size; ++i) {
-					base bits = carry >> div.rem;
-					carry = digits[i] & mask;
-					digits[i] <<= div.rem;
-					digits[i] |= bits; 
-				}
-			}
-			return *this;
-		}
-
-		integer operator>>=(int delta)
-		{
-			// Find whole and partial move
-			auto div = std::div(delta, max);
-			size_t range = size - div.quot;
-			if (div.quot) {
-				// Move whole bytes
-				base *ptr = digits.data();
-				size_t bytes = range * sizeof(base);
-				std::memmove(ptr, ptr + div.quot, bytes);
-				std::memset(ptr + range, base(0), div.quot);
-			}
-			if (div.rem) {
-				// Move partial bits
-				const base mask = ~base(0) >> div.rem;
-				base carry = 0;
-				for (size_t i = range - 1; i > -1; --i) {
-					base bits = carry << div.rem;
-					carry = digits[i] bitand mask;
-					digits[i] >>= div.rem;
-					digits[i] |= bits;
-				} 
+				dig = max;
 			}
 			return *this;
 		}
@@ -275,31 +222,44 @@ namespace arithmetic
 			return !equal;
 		}
 
+		bool operator!()
+		{
+			auto zero = [](base dig){ return !dig; };
+			return std::all_of(digits.begin(), digits.end(), zero);
+		}
+
 		integer operator=(const std::string &string)
 		{
-			int carry = 0, order = 1, index = 0;
-			for (const auto ch : string) {
-				int num = ch - '0';
-				carry += order * num;
+			digits.fill(0);
+			size_t index = 0;
+			uint_t carry = 0;
+			uint_t order = 1;
+			for (auto it=string.rend(); it!=string.rbegin(); ++it) {
+				uint_t num = *it - '0';
+				carry += num * order;
+				order *= 10;
 				if (max < carry) {
-					auto div = std::div(carry, max);
+					auto div = std::imaxdiv(carry, max);
 					digits[index] = div.rem;
 					carry = div.quot;
 					++index;
 				}
-				order *= 10;
 			}
 			return *this;
 		}
 
-		integer operator=(int value)
+		integer operator=(uint_t num)
 		{
-			int index = 0;
-			while (value) {
-				auto div = std::div(value, max);
+			digits.fill(0);
+			size_t index = 0;
+			while (num) {
+				auto div = std::imaxdiv(num, max);
 				digits[index] = div.rem;
-				value = div.quot;
+				num = div.quot;
 				++index;
+				if (size == index) {
+					throw overflow("=int");
+				}
 			}
 			return *this;
 		}
@@ -307,29 +267,22 @@ namespace arithmetic
 		operator std::string() const
 		{
 			std::string string;
-			for (size_t index = size, i = 0; i < size; ++i) {
-				base dig = digits[--index];
-				char dec[digindec] = {'0'};
-				for (size_t j = 0; dig; ++j) {
-					auto div = std::div(dig, 10);
-					dec[j] += div.rem;
-					dig = div.quot;
-				}
-				string += dec;
+			for (base dig : digits) {
+				string += ":" + std::to_string(dig);
 			}
 			return string;
 		}
 
-		operator int() const
+		operator uint_t() const
 		{
 			size_t index = 0;
-			int value = 0, order = 1;
+			uint_t num = 0, order = 1;
 			while (index < size) {
-				value += order * digits[index];
+				num += order * digits[index];
 				order *= max;
 				++index;
 			}
-			return value;
+			return num;
 		}
 
 		integer()
@@ -337,25 +290,23 @@ namespace arithmetic
 			digits.fill(0);
 		}
 
-		integer(int value)
+		integer(uint_t num)
 		{
-			digits.fill(0);
-			*this = value;
+			*this = num;
 		}
 
 		integer(const std::string &string)
 		{
-			digits.fill(0);
 			*this = string;
 		}
 
 		inline void swap(integer &that)
 		{
-			std::swap(digits, that.digits);
+			digits.swap(that.digits);
 		}
 	};
 
 }; // namespace arithmetic
 
-#endif // Metric_arith
+#endif // Metric_arithmetic
 

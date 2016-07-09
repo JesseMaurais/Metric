@@ -1,4 +1,4 @@
-#include "maths.hpp"
+#include "numeric.hpp"
 #include <lux/lux.hpp>
 
 /**
@@ -11,9 +11,9 @@
  * never depend on such assumptions, and we do not have to.
  */
 
-extern "C" int luaopen_maths(lua_State *state)
+extern "C" int luaopen_numeric(lua_State *state)
 {
-	using namespace maths;
+	using namespace numeric;
 	luaL_Reg regs[] =
 	{
 	// common factors

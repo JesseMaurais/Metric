@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-std=c++14 -Wall
-SRC=arith.hpp maths.hpp stats.hpp
-OBJ=arith.so maths.so stats.so
+SRC=arithmetic.hpp numeric.hpp statistics.hpp
+OBJ=arithmetic.so numeric.so statistics.so
 DIR=/usr/local/lib/lua/5.3/
 
 all: $(OBJ)
