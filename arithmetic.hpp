@@ -1,25 +1,16 @@
 #ifndef Metric_arith
 #define Metric_arith
 
-/**
- * This file will contain classes for doing arithmetic on numbers of arbitrary
- * or user defined precision. The integer class is based on the concept of the
- * digit in base 256. Our common decimal system is base 10, which means that a
- * digit can have symbols 0 to 9. A base 256 system has digits that are from 0
- * to 255, which is just enough to fit inside a byte. The usual algorithms for
- * numbers, such as addition and multiplication, work the same way as decmial,
- * only in a different base. So an array of bytes serves to store our numbers,
- * and the array size gives the precision of the integer.
- */
+#include <array>
+#include <limits>
+#include <string>
+#include <utility>
+#include <algorithm>
+#include <stdexcept>
+#include <cinttypes>
+#include <cstdint>
 
-#include <array>	// std::array
-#include <limits>	// std::numeric_limits
-#include <string>	// std::string, std::to_string
-#include <utility>	// std::rel_ops
-#include <algorithm>	// std::reverse, std::all_of
-#include <stdexcept>	// std::overflow_error, std::underflow_error
-#include <cinttypes>	// imaxdiv
-#include <cstdint>	// uint8_t
+#include "algorithm.hpp"
 
 namespace arithmetic
 {
@@ -93,7 +84,7 @@ namespace arithmetic
 		using overflow = std::overflow_error;
 		using underflow = std::underflow_error;
 
-		static constexpr uint_t max = std::numeric_limits<base>::max();
+		static const uint_t mod = 1 + std::numeric_limits<base>::max();
 
 		std::array<base, size> digits;
 
@@ -104,8 +95,8 @@ namespace arithmetic
 			uint_t carry = 0;
 			for (size_t i = 0; i < size; ++i) {
 				uint_t num = digits[i] + that.digits[i] + carry;
-				if (max < num) {
-					auto div = std::imaxdiv(num, max);
+				if (mod < num) {
+					auto div = std::imaxdiv(num, mod);
 					digits[i] = div.rem;
 					carry = div.quot;	
 				} else {
@@ -126,7 +117,7 @@ namespace arithmetic
 				int_t num = digits[i] - that.digits[i] - carry;
 				carry = 0;
 				while (num < 0) {
-					num += max;
+					num += mod;
 					++carry;
 				}
 				digits[i] = num;
@@ -144,8 +135,8 @@ namespace arithmetic
 			for (size_t i = 0; i < size; ++i) {
 			 for (size_t j = 0; j < size; ++j) {
 				uint_t num = digits[i] * that.digits[j] + carry;
-				if (max < num) {
-					auto div = std::imaxdiv(num, max);
+				if (mod < num) {
+					auto div = std::imaxdiv(num, mod);
 					sums[i + j] += div.rem;
 					carry = div.quot;
 				} else {
@@ -182,7 +173,7 @@ namespace arithmetic
 		integer operator++()
 		{
 			for (base &dig : digits) {
-				if (dig < max) {
+				if (dig < mod) {
 					++dig;
 					break;
 				}
@@ -198,7 +189,7 @@ namespace arithmetic
 					--dig;
 					break;
 				}
-				dig = max;
+				dig = mod;
 			}
 			return *this;
 		}
@@ -225,26 +216,13 @@ namespace arithmetic
 		bool operator!()
 		{
 			auto zero = [](base dig){ return !dig; };
-			return std::all_of(digits.begin(), digits.end(), zero);
+			return algorithm::all_of(digits, zero);
 		}
 
 		integer operator=(const std::string &string)
 		{
 			digits.fill(0);
-			size_t index = 0;
-			uint_t carry = 0;
-			uint_t order = 1;
-			for (auto it=string.rend(); it!=string.rbegin(); ++it) {
-				uint_t num = *it - '0';
-				carry += num * order;
-				order *= 10;
-				if (max < carry) {
-					auto div = std::imaxdiv(carry, max);
-					digits[index] = div.rem;
-					carry = div.quot;
-					++index;
-				}
-			}
+			// working on it
 			return *this;
 		}
 
@@ -253,7 +231,7 @@ namespace arithmetic
 			digits.fill(0);
 			size_t index = 0;
 			while (num) {
-				auto div = std::imaxdiv(num, max);
+				auto div = std::imaxdiv(num, mod);
 				digits[index] = div.rem;
 				num = div.quot;
 				++index;
@@ -279,7 +257,7 @@ namespace arithmetic
 			uint_t num = 0, order = 1;
 			while (index < size) {
 				num += order * digits[index];
-				order *= max;
+				order *= mod;
 				++index;
 			}
 			return num;
