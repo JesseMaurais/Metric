@@ -81,7 +81,6 @@ namespace arithmetic
 		using int_t = intmax_t;
 		using uint_t = uintmax_t;
 
-		using divide = std::imaxdiv;
 		using overflow = std::overflow_error;
 		using underflow = std::underflow_error;
 
@@ -98,7 +97,7 @@ namespace arithmetic
 			for (size_t i = 0; i < size; ++i) {
 				uint_t num = digits[i] + that.digits[i] + carry;
 				if (max < num) {
-					auto div = divide(num, mod);
+					auto div = std::imaxdiv(num, mod);
 					digits[i] = div.rem;
 					carry = div.quot;	
 				} else {
@@ -138,7 +137,7 @@ namespace arithmetic
 			 for (size_t j = 0; j < size; ++j) {
 				uint_t num = digits[i] * that.digits[j] + carry;
 				if (max < num) {
-					auto div = divide(num, mod);
+					auto div = std::imaxdiv(num, mod);
 					sums[i + j] += div.rem;
 					carry = div.quot;
 				} else {
@@ -229,7 +228,7 @@ namespace arithmetic
 				for (size_t i = 0; i < size; ++i) {
 					carry += digits[i] * 10;
 					if (max < carry) {
-						auto div = divide(carry, mod);
+						auto div = std::imaxdiv(carry, mod);
 						digits[i] = div.rem;
 						carry = div.quot;
 					} else {
@@ -249,7 +248,7 @@ namespace arithmetic
 			digits.fill(0);
 			size_t index = 0;
 			while (num) {
-				auto div = divide(num, mod);
+				auto div = std::imaxdiv(num, mod);
 				digits[index] = div.rem;
 				num = div.quot;
 				++index;
