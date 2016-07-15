@@ -222,7 +222,23 @@ namespace arithmetic
 		integer operator=(const std::string &string)
 		{
 			digits.fill(0);
-			// working on it
+			for (char byte : string) {
+				uint_t carry = byte - '0';
+				for (size_t index = 0; index < size; ++index) {
+					carry += digits[index] * 10;
+					if (mod < carry) {
+						auto div = std::imaxdiv(carry, mod);
+						digits[index] = div.rem;
+						carry = div.quot;
+					} else {
+						digits[index] = carry;
+						carry = 0;
+					}
+				}
+				if (carry) {
+					throw overflow("=string");
+				}
+			}
 			return *this;
 		}
 
