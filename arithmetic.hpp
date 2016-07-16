@@ -107,7 +107,7 @@ namespace arithmetic
 					carry = 0;
 				}
 			}
-			if (carry) {
+			if (0 < carry) {
 				throw overflow("+");
 			}
 			return *this;
@@ -123,7 +123,7 @@ namespace arithmetic
 				}
 				digits[i] = diff;
 			}
-			if (carry) {
+			if (0 < carry) {
 				throw underflow("-");
 			}
 			return *this;
@@ -145,7 +145,7 @@ namespace arithmetic
 						carry = 0;
 					}
 				}
-				if (carry) {
+				if (0 < carry) {
 					throw overflow("*");
 				}
 				digits[i] = sums[i];
@@ -183,6 +183,7 @@ namespace arithmetic
 				digit = 0;
 			}
 			throw overflow("++");
+			return *this;
 		}
 
 		integer operator--()
@@ -195,6 +196,7 @@ namespace arithmetic
 				digit = max;
 			}
 			throw underflow("--");
+			return *this;
 		}
 
 		integer operator=(const std::string &string)
@@ -213,23 +215,23 @@ namespace arithmetic
 						carry = 0;
 					}
 				}
-				if (carry) {
+				if (0 < carry) {
 					throw overflow("=string");
 				}
 			}
 			return *this;
 		}
 
-		integer operator=(uint_t num)
+		integer operator=(uint_t number)
 		{
 			digits.fill(0);
-			for (size_t i = 0; num; ++i) {
+			for (size_t i = 0; 0 < number; ++i) {
 				if (size == i) {
 					throw overflow("=int");
 				}
-				auto div = divide(num, mod);
+				auto div = divide(number, mod);
 				digits[i] = div.rem;
-				num = div.quot;
+				number = div.quot;
 			}
 			return *this;
 		}
@@ -247,12 +249,12 @@ namespace arithmetic
 		operator uint_t() const
 		{
 			uint_t num = 0;
-			for (auto digit : algorithm::reversed(digits) {
-				uint_t check = carry;
-				num += digit * max;
-				if (num < check) {
+			for (auto digit : algorithm::reversed(digits)) {
+				uint_t check = num * mod + digit;
+				if (check < num) {
 					throw overflow("int=");
 				}
+				num = check;
 			}
 			return num;
 		}
@@ -284,10 +286,9 @@ namespace arithmetic
 
 		bool operator<(const integer &that)
 		{
-			using namespace algorithm;
-			auto A = reversed(digits);
-			auto B = reversed(that.digits);
-			return lexicographical_compare(A, B);
+			auto A = algorithm::reversed(digits);
+			auto B = algorithm::reversed(that.digits);
+			return algorithm::lexicographical_compare(A, B);
 		}
 
 		bool operator!()

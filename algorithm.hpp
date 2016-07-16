@@ -49,13 +49,13 @@ namespace algorithm
 	}
 
 	template <typename containerA, typename containerB> inline
-	bool lexicographical_compare(containerA &a, containerB &B)
+	bool lexicographical_compare(containerA &a, containerB &b)
 	{
-		auto Abegin = std::begin(a);
-		auto Aend = std::end(a);
-		auto Bbegin = std::begin(b);
-		auto Bend = std::end(b);
-		return std::lexicographical_compare(Abegin, Aend, Bbegin, Bend);
+		auto abegin = std::begin(a);
+		auto aend = std::end(a);
+		auto bbegin = std::begin(b);
+		auto bend = std::end(b);
+		return std::lexicographical_compare(abegin, aend, bbegin, bend);
 	}
 
 }; // namespace algorithm
