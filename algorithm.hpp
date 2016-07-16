@@ -1,6 +1,9 @@
 #ifndef Metric_algorithm
 #define Metric_algorithm
 
+#include <numeric>
+#include <algorithm>
+
 namespace algorithm
 {
 	// Utility for a reversed range-for loop
@@ -28,34 +31,37 @@ namespace algorithm
 		return { reference };
 	}
 
-	// Iterator over container algorithms
+	// Iterate over container algorithms
 
-	template <typename container, typename unary> inline
-	bool all_of(container &to, unary predicate)
+	template <typename container> inline
+	void reverse(container &a)
 	{
-		return std::all_of(std::begin(to), std::end(to), predicate);
+		std::reverse(std::begin(a), std::end(a));
 	}
 
 	template <typename container, typename unary> inline
-	bool any_of(container &to, unary predicate)
+	bool all_of(container &a, unary predicate)
 	{
-		return std::any_of(std::begin(to), std::end(to), predicate);
+		return std::all_of(std::begin(a), std::end(a), predicate);
+	}
+
+	template <typename container, typename unary> inline
+	bool any_of(container &a, unary predicate)
+	{
+		return std::any_of(std::begin(a), std::end(a), predicate);
 	}
 
 	template <typename container, typename type> inline
-	type accumulate(container &from, type init=0)
+	type accumulate(container &a, type init=0)
 	{
-		return std::accumulate(std::begin(from), std::end(from), init);
+		return std::accumulate(std::begin(a), std::end(a), init);
 	}
 
-	template <typename containerA, typename containerB> inline
-	bool lexicographical_compare(containerA &a, containerB &b)
+	template <typename container> inline
+	bool lexicographical_compare(container &a, container &b)
 	{
-		auto abegin = std::begin(a);
-		auto aend = std::end(a);
-		auto bbegin = std::begin(b);
-		auto bend = std::end(b);
-		return std::lexicographical_compare(abegin, aend, bbegin, bend);
+		return std::lexicographical_compare(std::begin(a), std::end(a),
+		                                    std::begin(b), std::end(b));
 	}
 
 }; // namespace algorithm

@@ -1,7 +1,7 @@
-#include "arithmetic.hpp"
+#include "integer.hpp"
 #include <lux/lux.hpp>
 
-template <size_t size> struct lux_Integer
+template <size_t size> struct integer
 {
 	typedef arithmetic::integer<size> User;
 	typedef lux_Store<User> Type;
@@ -131,8 +131,8 @@ template <size_t size> struct lux_Integer
 };
 
 
-extern "C" int luaopen_arithmetic(lua_State *state)
+extern "C" int luaopen_integer(lua_State *state)
 {
-	return lux_Integer<8>::open(state);
+	return integer<8>::open(state);
 }
 
