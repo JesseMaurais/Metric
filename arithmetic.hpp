@@ -5,6 +5,7 @@
 #include <limits>
 #include <string>
 #include <utility>
+#include <numeric>
 #include <algorithm>
 #include <stdexcept>
 #include <cinttypes>
@@ -83,6 +84,7 @@ namespace arithmetic
 
 		using overflow = std::overflow_error;
 		using underflow = std::underflow_error;
+		static constexpr auto divide = std::imaxdiv;
 
 		static const uint_t max = std::numeric_limits<base>::max();
 		static const uint_t mod = max + 1;
@@ -95,13 +97,13 @@ namespace arithmetic
 		{
 			uint_t carry = 0;
 			for (size_t i = 0; i < size; ++i) {
-				uint_t num = digits[i] + that.digits[i] + carry;
-				if (max < num) {
-					auto div = std::imaxdiv(num, mod);
+				carry += digits[i] + that.digits[i];
+				if (max < carry) {
+					auto div = divide(carry, mod);
 					digits[i] = div.rem;
 					carry = div.quot;	
 				} else {
-					digits[i] = num;
+					digits[i] = carry;
 					carry = 0;
 				}
 			}
@@ -115,13 +117,11 @@ namespace arithmetic
 		{
 			uint_t carry = 0;
 			for (size_t i = 0; i < size; ++i) {
-				int_t num = digits[i] - that.digits[i] - carry;
-				carry = 0;
-				while (num < 0) {
-					num += mod;
-					++carry;
+				int_t diff = digits[i] - that.digits[i] - carry;
+				for (carry = 0; diff < 0; ++carry) {
+					diff += mod;
 				}
-				digits[i] = num;
+				digits[i] = diff;
 			}
 			if (carry) {
 				throw underflow("-");
@@ -134,20 +134,22 @@ namespace arithmetic
 			uint_t carry = 0;
 			uint_t sums[size*2] = {0};
 			for (size_t i = 0; i < size; ++i) {
-			 for (size_t j = 0; j < size; ++j) {
-				uint_t num = digits[i] * that.digits[j] + carry;
-				if (max < num) {
-					auto div = std::imaxdiv(num, mod);
-					sums[i + j] += div.rem;
-					carry = div.quot;
-				} else {
-					sums[i + j] += num;
-					carry = 0;
+				for (size_t j = 0; j < size; ++j) {
+					carry += digits[i] * that.digits[j];
+					if (max < carry) {
+						auto div = divide(carry, mod);
+						sums[i+j] += div.rem;
+						carry = div.quot;
+					} else {
+						sums[i+j] += carry;
+						carry = 0;
+					}
 				}
-			 }
-			 digits[i] = sums[i];
-			 sums[size + i] += carry;
-			 carry = 0;
+				if (carry) {
+					throw overflow("*");
+				}
+				digits[i] = sums[i];
+				carry = 0;
 			}
 			return *this;
 		}
@@ -173,62 +175,37 @@ namespace arithmetic
 
 		integer operator++()
 		{
-			for (base &dig : digits) {
-				if (dig < max) {
-					++dig;
-					break;
+			for (base & digit : digits) {
+				if (digit < max) {
+					++digit;
+					return *this;
 				}
-				dig = 0;
+				digit = 0;
 			}
-			return *this;
+			throw overflow("++");
 		}
 
 		integer operator--()
 		{
-			for (base &dig : digits) {
-				if (0 < dig) {
-					--dig;
-					break;
+			for (base & digit : digits) {
+				if (0 < digit) {
+					--digit;
+					return *this;
 				}
-				dig = max;
+				digit = max;
 			}
-			return *this;
-		}
-
-		bool operator==(const integer &that)
-		{
-			return digits == that.digits;
-		}
-
-		bool operator<(const integer &that)
-		{
-			bool equal = true;
-			for (size_t i = 0; i < size; ++i) {
-				if (digits[i] > that.digits[i]) {
-					return false;
-				}
-				if (digits[i] < that.digits[i]) {
-					equal = false;
-				}
-			}
-			return !equal;
-		}
-
-		bool operator!()
-		{
-			auto zero = [](base dig){return !dig;};
-			return algorithm::all_of(digits, zero);
+			throw underflow("--");
 		}
 
 		integer operator=(const std::string &string)
 		{
 			digits.fill(0);
-			for (char byte : string) {
-				uint_t carry = byte - '0';
+			for (char code : string) {
+				uint_t carry = code - '0';
 				for (size_t i = 0; i < size; ++i) {
 					carry += digits[i] * 10;
 					if (max < carry) {
-						auto div = std::imaxdiv(carry, mod);
+						auto div = divide(carry, mod);
 						digits[i] = div.rem;
 						carry = div.quot;
 					} else {
@@ -246,15 +223,13 @@ namespace arithmetic
 		integer operator=(uint_t num)
 		{
 			digits.fill(0);
-			size_t index = 0;
-			while (num) {
-				auto div = std::imaxdiv(num, mod);
-				digits[index] = div.rem;
-				num = div.quot;
-				++index;
-				if (size == index) {
+			for (size_t i = 0; num; ++i) {
+				if (size == i) {
 					throw overflow("=int");
 				}
+				auto div = divide(num, mod);
+				digits[i] = div.rem;
+				num = div.quot;
 			}
 			return *this;
 		}
@@ -271,13 +246,13 @@ namespace arithmetic
 
 		operator uint_t() const
 		{
-			size_t index = 0;
-			uint_t num = 0, order = 1;
-			while (index < size) {
-				num += order * digits[index];
-				order *= mod;
-				++index;
-				//should detect overflow
+			uint_t num = 0;
+			for (auto digit : algorithm::reversed(digits) {
+				uint_t check = carry;
+				num += digit * max;
+				if (num < check) {
+					throw overflow("int=");
+				}
 			}
 			return num;
 		}
@@ -300,6 +275,25 @@ namespace arithmetic
 		inline void swap(integer &that)
 		{
 			digits.swap(that.digits);
+		}
+
+		bool operator==(const integer &that)
+		{
+			return digits == that.digits;
+		}
+
+		bool operator<(const integer &that)
+		{
+			using namespace algorithm;
+			auto A = reversed(digits);
+			auto B = reversed(that.digits);
+			return lexicographical_compare(A, B);
+		}
+
+		bool operator!()
+		{
+			auto zero = [](base dig){return !dig;};
+			return algorithm::all_of(digits, zero);
 		}
 	};
 
