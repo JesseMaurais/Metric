@@ -140,14 +140,14 @@ namespace arithmetic
 			digits.fill(0);
 			for (char code : string) {
 				uint_t carry = code - '0';
-				for (size_t i = 0; i < size; ++i) {
-					carry += digits[i] * 10;
+				for (base & digit : digits) {
+					carry += digit * 10;
 					if (max < carry) {
 						auto div = divide(carry, mod);
-						digits[i] = div.rem;
+						digit = div.rem;
 						carry = div.quot;
 					} else {
-						digits[i] = carry;
+						digit = carry;
 						carry = 0;
 					}
 				}
@@ -175,11 +175,10 @@ namespace arithmetic
 		operator std::string() const
 		{
 			std::string string;
-			integer number = *this;
-			auto reversed = algorithm::reversed(number.digits);
-			bool zero = !number;
-			while (!zero)
-			{
+			storage array = digits;
+			auto reversed = algorithm::reversed(array);
+			bool zero;
+			do {
 				zero = true;
 				uint_t carry = 0;
 				for (base & digit : reversed) {
@@ -194,6 +193,7 @@ namespace arithmetic
 				}
 				string += char(carry + '0');
 			}
+			while (!zero);
 			algorithm::reverse(string);
 			return string;
 		}
@@ -201,7 +201,7 @@ namespace arithmetic
 		operator uint_t() const
 		{
 			uint_t carry = 0;
-			for (auto digit : algorithm::reversed(digits)) {
+			for (base digit : algorithm::reversed(digits)) {
 				uint_t check = carry * mod + digit;
 				if (check < carry) {
 					throw overflow("int=");
