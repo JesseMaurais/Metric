@@ -74,6 +74,19 @@ namespace arithmetic
 		return a >>= b;
 	}
 
+	template <typename number> struct div
+	{
+		number quot, rem;
+
+		div(const number &num, const number &den) : rem(num), quot(0)
+		{
+			while (rem >= den) {
+				rem -= den;
+				++quot;
+			}
+		}
+	};
+
 }; // namespace arithmetic
 
 #endif // Metric_arithmetic

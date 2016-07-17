@@ -135,12 +135,6 @@ namespace arithmetic
 			return *this;
 		}
 
-		integer operator=(const storage &array)
-		{
-			digits = array;
-			return *this;
-		}
-
 		integer operator=(const std::string &string)
 		{
 			digits.fill(0);
@@ -181,7 +175,7 @@ namespace arithmetic
 		operator std::string() const
 		{
 			std::string string;
-			integer number = digits;
+			integer number = *this;
 			auto reversed = algorithm::reversed(number.digits);
 			bool zero = !number;
 			while (!zero)
@@ -189,11 +183,12 @@ namespace arithmetic
 				zero = true;
 				uint_t carry = 0;
 				for (base & digit : reversed) {
+					carry *= mod;
 					carry += digit;
 					auto div = divide(carry, 10);
 					digit = div.quot;
 					carry = div.rem;
-					if (zero and 0 < digit) {
+					if (0 < digit) {
 						zero = false;
 					}
 				}
@@ -205,15 +200,15 @@ namespace arithmetic
 
 		operator uint_t() const
 		{
-			uint_t num = 0;
+			uint_t carry = 0;
 			for (auto digit : algorithm::reversed(digits)) {
-				uint_t check = num * mod + digit;
-				if (check < num) {
+				uint_t check = carry * mod + digit;
+				if (check < carry) {
 					throw overflow("int=");
 				}
-				num = check;
+				carry = check;
 			}
-			return num;
+			return carry;
 		}
 
 		integer()
