@@ -57,8 +57,8 @@ namespace algorithm
 		return std::accumulate(std::begin(a), std::end(a), init);
 	}
 
-	template <typename container> inline
-	bool lexicographical_compare(container &a, container &b)
+	template <typename containerA, typename containerB> inline
+	bool lexicographical_compare(containerA &a, containerB &b)
 	{
 		return std::lexicographical_compare(std::begin(a), std::end(a),
 		                                    std::begin(b), std::end(b));

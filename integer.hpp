@@ -93,8 +93,8 @@ namespace arithmetic
 		integer operator/=(const integer &that)
 		{
 			integer quot;
-			while (*this >= that) {
-				*this -= that;
+			while (!operator<(that)) {
+				operator-=(that);
 				++quot;
 			}
 			swap(quot);
@@ -103,8 +103,8 @@ namespace arithmetic
 
 		integer operator%=(const integer &that)
 		{
-			while (*this >= that) {
-				*this -= that;
+			while (!operator<(that)) {
+				operator-=(that);
 			}
 			return *this;
 		}
@@ -218,17 +218,12 @@ namespace arithmetic
 
 		integer(uint_t num)
 		{
-			*this = num;
-		}
-
-		integer(const storage &array)
-		{
-			*this = array;
+			operator=(num);
 		}
 
 		integer(const std::string &string)
 		{
-			*this = string;
+			operator=(string);
 		}
 
 		void swap(integer &that)
@@ -243,9 +238,11 @@ namespace arithmetic
 
 		bool operator<(const integer &that)
 		{
-			auto A = algorithm::reversed(digits);
-			auto B = algorithm::reversed(that.digits);
-			return algorithm::lexicographical_compare(A, B);
+			auto &A = digits;
+			auto &B = that.digits;
+			return std::lexicographical_compare(
+				std::rbegin(A), std::rend(A),
+				std::rbegin(B), std::rend(B));
 		}
 
 		bool operator!()
