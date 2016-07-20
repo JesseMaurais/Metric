@@ -81,7 +81,7 @@ namespace arithmetic
 						carry = 0;
 					}
 				}
-				if (0 < carry) {
+				if (carry) {
 					throw overflow("*");
 				}
 				digits[i] = sums[i];
@@ -159,7 +159,7 @@ namespace arithmetic
 		integer operator=(uint_t arg)
 		{
 			digits.fill(0);
-			uint_t &carry = arg;
+			uint_t carry = arg;
 			for (base & digit : digits) {
 				auto div = divide(carry, mod);
 				digit = div.rem;
@@ -237,9 +237,9 @@ namespace arithmetic
 
 		bool operator<(const integer &arg)
 		{
-			auto A = algorithm::reversed(digits);
-			auto B = algorithm::reversed(arg.digits);
-			return algorithm::lexicographical_compare(A, B);
+			auto a = algorithm::reversed(digits);
+			auto b = algorithm::reversed(arg.digits);
+			return algorithm::lexicographical_compare(a, b);
 		}
 
 		bool operator!()
