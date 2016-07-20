@@ -36,32 +36,32 @@ namespace algorithm
 	template <typename container> inline
 	void reverse(container &a)
 	{
-		std::reverse(std::begin(a), std::end(a));
+		std::reverse(begin(a), end(a));
 	}
 
 	template <typename container, typename unary> inline
 	bool all_of(container &a, unary predicate)
 	{
-		return std::all_of(std::begin(a), std::end(a), predicate);
+		return std::all_of(begin(a), end(a), predicate);
 	}
 
 	template <typename container, typename unary> inline
 	bool any_of(container &a, unary predicate)
 	{
-		return std::any_of(std::begin(a), std::end(a), predicate);
+		return std::any_of(begin(a), end(a), predicate);
 	}
 
 	template <typename container, typename type> inline
 	type accumulate(container &a, type init=0)
 	{
-		return std::accumulate(std::begin(a), std::end(a), init);
+		return std::accumulate(begin(a), end(a), init);
 	}
 
 	template <typename containerA, typename containerB> inline
 	bool lexicographical_compare(containerA &a, containerB &b)
 	{
-		return std::lexicographical_compare(std::begin(a), std::end(a),
-		                                    std::begin(b), std::end(b));
+		return std::lexicographical_compare(begin(a), end(a),
+		                                    begin(b), end(b));
 	}
 
 }; // namespace algorithm

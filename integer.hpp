@@ -29,11 +29,11 @@ namespace arithmetic
 
 	public:
 
-		integer operator+=(const integer &that)
+		integer operator+=(const integer &arg)
 		{
 			uint_t carry = 0;
 			for (size_t i = 0; i < size; ++i) {
-				carry += digits[i] + that.digits[i];
+				carry += digits[i] + arg.digits[i];
 				if (max < carry) {
 					auto div = divide(carry, mod);
 					digits[i] = div.rem;
@@ -43,35 +43,35 @@ namespace arithmetic
 					carry = 0;
 				}
 			}
-			if (0 < carry) {
+			if (carry) {
 				throw overflow("+");
 			}
 			return *this;
 		}
 
-		integer operator-=(const integer &that)
+		integer operator-=(const integer &arg)
 		{
 			uint_t carry = 0;
 			for (size_t i = 0; i < size; ++i) {
-				int_t diff = digits[i] - that.digits[i] - carry;
+				int_t diff = digits[i] - arg.digits[i] - carry;
 				for (carry = 0; diff < 0; ++carry) {
 					diff += mod;
 				}
 				digits[i] = diff;
 			}
-			if (0 < carry) {
+			if (carry) {
 				throw underflow("-");
 			}
 			return *this;
 		}
 
-		integer operator*=(const integer &that)
+		integer operator*=(const integer &arg)
 		{
 			uint_t carry = 0;
 			uint_t sums[size*2] = {0};
 			for (size_t i = 0; i < size; ++i) {
 				for (size_t j = 0; j < size; ++j) {
-					carry += digits[i] * that.digits[j];
+					carry += digits[i] * arg.digits[j];
 					if (max < carry) {
 						auto div = divide(carry, mod);
 						sums[i+j] += div.rem;
@@ -90,21 +90,21 @@ namespace arithmetic
 			return *this;
 		}
 
-		integer operator/=(const integer &that)
+		integer operator/=(const integer &arg)
 		{
 			integer quot;
-			while (!operator<(that)) {
-				operator-=(that);
+			while (!operator<(arg)) {
+				operator-=(arg);
 				++quot;
 			}
 			swap(quot);
 			return *this;
 		}
 
-		integer operator%=(const integer &that)
+		integer operator%=(const integer &arg)
 		{
-			while (!operator<(that)) {
-				operator-=(that);
+			while (!operator<(arg)) {
+				operator-=(arg);
 			}
 			return *this;
 		}
@@ -119,7 +119,6 @@ namespace arithmetic
 				digit = 0;
 			}
 			throw overflow("++");
-			return *this;
 		}
 
 		integer operator--()
@@ -132,13 +131,12 @@ namespace arithmetic
 				digit = max;
 			}
 			throw underflow("--");
-			return *this;
 		}
 
-		integer operator=(const std::string &string)
+		integer operator=(const std::string &arg)
 		{
 			digits.fill(0);
-			for (char code : string) {
+			for (char code : arg) {
 				uint_t carry = code - '0';
 				for (base & digit : digits) {
 					carry += digit * 10;
@@ -151,25 +149,26 @@ namespace arithmetic
 						carry = 0;
 					}
 				}
-				if (0 < carry) {
+				if (carry) {
 					throw overflow("=string");
 				}
 			}
 			return *this;
 		}
 
-		integer operator=(uint_t number)
+		integer operator=(uint_t arg)
 		{
 			digits.fill(0);
-			for (size_t i = 0; 0 < number; ++i) {
-				if (size == i) {
-					throw overflow("=int");
+			uint_t &carry = arg;
+			for (base & digit : digits) {
+				auto div = divide(carry, mod);
+				digit = div.rem;
+				carry = div.quot;
+				if (!carry) {
+					return *this;
 				}
-				auto div = divide(number, mod);
-				digits[i] = div.rem;
-				number = div.quot;
 			}
-			return *this;
+			throw overflow("=int");
 		}
 
 		operator std::string() const
@@ -187,7 +186,7 @@ namespace arithmetic
 					auto div = divide(carry, 10);
 					digit = div.quot;
 					carry = div.rem;
-					if (0 < digit) {
+					if (digit) {
 						zero = false;
 					}
 				}
@@ -216,38 +215,36 @@ namespace arithmetic
 			digits.fill(0);
 		}
 
-		integer(uint_t num)
+		integer(uint_t arg)
 		{
-			operator=(num);
+			operator=(arg);
 		}
 
-		integer(const std::string &string)
+		integer(const std::string &arg)
 		{
-			operator=(string);
+			operator=(arg);
 		}
 
-		void swap(integer &that)
+		void swap(integer &arg)
 		{
-			digits.swap(that.digits);
+			digits.swap(arg.digits);
 		}
 
-		bool operator==(const integer &that)
+		bool operator==(const integer &arg)
 		{
-			return digits == that.digits;
+			return digits == arg.digits;
 		}
 
-		bool operator<(const integer &that)
+		bool operator<(const integer &arg)
 		{
-			auto &A = digits;
-			auto &B = that.digits;
-			return std::lexicographical_compare(
-				std::rbegin(A), std::rend(A),
-				std::rbegin(B), std::rend(B));
+			auto A = algorithm::reversed(digits);
+			auto B = algorithm::reversed(arg.digits);
+			return algorithm::lexicographical_compare(A, B);
 		}
 
 		bool operator!()
 		{
-			auto zero = [](base dig){return !dig;};
+			auto zero = [](base digit){ return !digit; };
 			return algorithm::all_of(digits, zero);
 		}
 	};
