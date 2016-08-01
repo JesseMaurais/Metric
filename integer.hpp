@@ -133,6 +133,57 @@ namespace arithmetic
 			throw underflow("--");
 		}
 
+		integer operator&=(const integer &arg)
+		{
+			for (size_t i = 0; i < size; ++i) {
+				digits[i] &= arg.digits[i];
+			}
+			return *this;
+		}
+
+		integer operator|=(const integer &arg)
+		{
+			for (size_t i = 0; i < size; ++i) {
+				digits[i] |= arg.digits[i];
+			}
+			return *this;
+		}
+
+		integer operator^=(const integer &arg)
+		{
+			for (size_t i = 0; i < size; ++i) {
+				digits[i] ^= arg.digits[i];
+			}
+			return *this;
+		}
+
+		integer operator~()
+		{
+			integer arg;
+			for (size_t i = 0; i < size; ++i) {
+				arg.digits[i] = ~digits[i];
+			}
+			return arg;
+		}
+
+		bool operator==(const integer &arg)
+		{
+			return digits == arg.digits;
+		}
+
+		bool operator<(const integer &arg)
+		{
+			auto a = algorithm::reversed(digits);
+			auto b = algorithm::reversed(arg.digits);
+			return algorithm::lexicographical_compare(a, b);
+		}
+
+		bool operator!(void)
+		{
+			auto zero = [](base digit){ return !digit; };
+			return algorithm::all_of(digits, zero);
+		}
+
 		integer operator=(const std::string &arg)
 		{
 			digits.fill(0);
@@ -228,24 +279,6 @@ namespace arithmetic
 		void swap(integer &arg)
 		{
 			digits.swap(arg.digits);
-		}
-
-		bool operator==(const integer &arg)
-		{
-			return digits == arg.digits;
-		}
-
-		bool operator<(const integer &arg)
-		{
-			auto a = algorithm::reversed(digits);
-			auto b = algorithm::reversed(arg.digits);
-			return algorithm::lexicographical_compare(a, b);
-		}
-
-		bool operator!()
-		{
-			auto zero = [](base digit){ return !digit; };
-			return algorithm::all_of(digits, zero);
 		}
 	};
 

@@ -39,16 +39,16 @@ namespace algorithm
 		std::reverse(begin(a), end(a));
 	}
 
-	template <typename container, typename unary> inline
-	bool all_of(container &a, unary predicate)
+	template <typename container, typename predicate> inline
+	bool all_of(container &a, predicate unary)
 	{
-		return std::all_of(begin(a), end(a), predicate);
+		return std::all_of(begin(a), end(a), unary);
 	}
 
-	template <typename container, typename unary> inline
-	bool any_of(container &a, unary predicate)
+	template <typename container, typename predicate> inline
+	bool any_of(container &a, predicate unary)
 	{
-		return std::any_of(begin(a), end(a), predicate);
+		return std::any_of(begin(a), end(a), unary);
 	}
 
 	template <typename container, typename type> inline
