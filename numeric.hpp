@@ -35,6 +35,8 @@
 #include <utility>
 #include <cmath>
 
+#include "logic.hpp"
+
 namespace numeric
 {
 	// These are not always defined in cmath nor with 128 bit precision
@@ -52,28 +54,26 @@ namespace numeric
 	constexpr auto ngamma  = 0.577215664901532860606512090082402431L;
 	
 	/// The greatest common divisor d so that m|d and n|d
-	template <typename int_t> int_t gcd(int_t m, int_t n)
+	template <typename uint_t> uint_t gcd(uint_t m, uint_t n)
 	{
 		if (n < m) std::swap(m, n);
-		int_t r;
 		while (m) {
-		 r = n % m;
-		 n = m;
-		 m = r;
+		 n %= m;
+		 std::swap(m, n);
 		}
 		return n;
 	}
 
 	/// The lowest common multiple, so that gcd(m, n)*lcm(m, n) = m*n
-	template <typename int_t> int_t lcm(int_t m, int_t n)
+	template <typename uint_t> uint_t lcm(uint_t m, uint_t n)
 	{
 		return m * (n / gcd(m, n));
 	}
 
 	/// The factorial of n, n! = n(n - 1)(n - 2)...(2)(1)
-	template <typename int_t> int_t fact(int_t n)
+	template <typename uint_t> uint_t fact(uint_t n)
 	{
-		int_t m = 1;
+		uint_t m = 1;
 		while (n) {
 		 m *= n;
 		 --n;
@@ -82,10 +82,10 @@ namespace numeric
 	}
 
 	/// The semifactorial of k, (2k)!! = (2k)(2k - 2)(2k - 4)...(4)(2)
-	template <typename int_t> int_t facts(int_t k)
+	template <typename uint_t> uint_t facts(uint_t k)
 	{
 		// (2k)!! = (k!)(2^k)
-		int_t m = 1, n = 1;
+		uint_t m = 1, n = 1;
 		while (k) {
 		 m *= k;
 		 --k;
@@ -94,27 +94,33 @@ namespace numeric
 		return m*n;
 	}
 
+	/// Determine whether two number are coprime
+	template <typename uint_t> bool coprime(uint_t m, uint_t n)
+	{
+		return 1 == gcd(m, n);
+	}
+
 	/// The primorial of n, n# = product of primes up to n + 1
-	template <typename int_t> int_t prim(int_t n)
+	template <typename uint_t> uint_t prim(uint_t n)
 	{
 		if (n < 2) return 1;
 		else ++n;
-		int_t p = 2, q = 3;
+		uint_t p = 2, q = 3;
 		while (q < n) {
-		 if (1 == gcd(p, q)) p *= q;
+		 if (coprime(p, q)) p *= q;
 		 q += 2;
 		}
 		return p;
 	}
 
 	/// Alternate primorial, p(n)# = product of first n primes
-	template <typename int_t> int_t primo(int_t n)
+	template <typename uint_t> uint_t primo(uint_t n)
 	{
 		if (n < 1) return 1;
 		else --n;
-		int_t p = 2, q = 3;
+		uint_t p = 2, q = 3;
 		while (n) {
-		 if (gcd(p, q) == 1) {
+		 if (coprime(p, q)) {
 		  p *= q;
 		  --n;
 		 }
@@ -124,10 +130,10 @@ namespace numeric
 	}
 
 	/// The k permutations of n elements, n!/(n - k)!
-	template <typename int_t> int_t perm(int_t n, int_t k)
+	template <typename uint_t> uint_t perm(uint_t n, uint_t k)
 	{
 		k = n - k;
-		int_t m = 1;
+		uint_t m = 1;
 		while (k) {
 		 m *= n;
 		 --n;
@@ -137,10 +143,10 @@ namespace numeric
 	}
 
 	/// The k combinations of n elements, n!/k!(n - k)!
-	template <typename int_t> int_t comb(int_t n, int_t k)
+	template <typename uint_t> uint_t comb(uint_t n, uint_t k)
 	{
 		k = std::min(k, n - k);
-		int_t m = 1, r = 1;
+		uint_t m = 1, r = 1;
 		while (k) {
 		 m *= n;
 		 --n;
@@ -252,7 +258,7 @@ namespace numeric
 		float_t t = pow(p, -x);
 		float_t s = 1 - t;
 		do {
-		 if (1 == gcd(p, q)) {
+		 if (coprime(p, q)) {
 		  t = pow(q, -x);
 		  s *= 1 - t;
 		  p *= q;
@@ -308,8 +314,8 @@ namespace numeric
 	/// Measures the complement of the error function (the tails)
 	template <typename float_t> float_t erfc(float_t x)
 	{
-		constexpr auto invsqrtpi = sqrt2/sqrt2pi;
-		return igammac<float_t>(0.5, x*x)*invsqrtpi;
+		constexpr auto isqrtpi = sqrt2/sqrt2pi;
+		return igammac<float_t>(0.5, x*x)*isqrtpi;
 	}
 
 	/// Measures the area under the bell curve for errors of size x
@@ -437,7 +443,8 @@ namespace numeric
 	/// Arcsine returns the angle of a given sine
 	template <typename float_t> float_t asin(float_t x)
 	{
-		return x*hyper<float_t>(0.5, 0.5, 1.5, x*x);
+		const float_t a = 0.5, b = 0.5, c = 1.5;
+		return x*hyper(a, b, c, x*x);
 	}
 
 	/// Arccosine returns the angle of a given cosine
@@ -449,7 +456,8 @@ namespace numeric
 	/// Arctangent returns the angle of a given tangent
 	template <typename float_t> float_t atan(float_t x)
 	{
-		return x*hyper<float_t>(0.5, 1.0, 1.5, -x*x);
+		const float_t a = 0.5, b = 1.0, c = 1.5;
+		return x*hyper(a, b, c, -x*x);
 	}
 
 	/// Deduces the quadrant correct angle of a given sine and cosine
@@ -517,7 +525,8 @@ namespace numeric
 	/// The angle with a hyperbolic tangent of x
 	template <typename float_t> float_t atanh(float_t x)
 	{
-		return x*hyper<float_t>(0.5, 1.0, 1.5, x*x);
+		const float_t a = 0.5, b = 1.0, c = 1.5;
+		return x*hyper(a, b, c, x*x);
 	}
 	
 }; // namespace numeric
