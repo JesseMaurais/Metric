@@ -1,5 +1,5 @@
-#ifndef Metric_maths
-#define Metric_maths
+#ifndef Metric_numeric
+#define Metric_numeric
 
 /**
  * The mathematical functions found in the C++ standard header, cmath, are
@@ -51,12 +51,16 @@ namespace numeric
 	constexpr auto sqrt2   = 1.414213562373095048801688724209698079L;
 	constexpr auto ngamma  = 0.577215664901532860606512090082402431L;
 	
-	/// The greatest common divisor; greatest d so that m|d and n|d
+	/// The greatest common divisor d so that m|d and n|d
 	template <typename int_t> int_t gcd(int_t m, int_t n)
 	{
 		if (n < m) std::swap(m, n);
 		int_t r;
-		while (m) r = n % m, n = m, m = r;
+		while (m) {
+		 r = n % m;
+		 n = m;
+		 m = r;
+		}
 		return n;
 	}
 
@@ -70,7 +74,10 @@ namespace numeric
 	template <typename int_t> int_t fact(int_t n)
 	{
 		int_t m = 1;
-		while (n) m *= n--;
+		while (n) {
+		 m *= n;
+		 --n;
+		}
 		return m;
 	}
 
@@ -79,7 +86,11 @@ namespace numeric
 	{
 		// (2k)!! = (k!)(2^k)
 		int_t m = 1, n = 1;
-		while (k) m *= k--, n <<= 1;
+		while (k) {
+		 m *= k;
+		 --k;
+		 n <<= 1;
+		}
 		return m*n;
 	}
 
@@ -90,9 +101,9 @@ namespace numeric
 		else ++n;
 		int_t p = 2, q = 3;
 		while (q < n) {
-		 if (gcd(p, q) == 1) p *= q;
+		 if (1 == gcd(p, q)) p *= q;
 		 q += 2;
-		};
+		}
 		return p;
 	}
 
@@ -117,7 +128,11 @@ namespace numeric
 	{
 		k = n - k;
 		int_t m = 1;
-		while (k--) m *= n--;
+		while (k) {
+		 m *= n;
+		 --n;
+		 --k;
+		}
 		return m;
 	}
 
@@ -126,7 +141,12 @@ namespace numeric
 	{
 		k = std::min(k, n - k);
 		int_t m = 1, r = 1;
-		while (k) m *= n--, r *= k--;
+		while (k) {
+		 m *= n;
+		 --n;
+		 r *= k;
+		 --k;
+		}
 		return m/r;
 	}
 	
@@ -145,31 +165,46 @@ namespace numeric
 	/// The lower incomplete gamma function
 	template <typename float_t> float_t igamma(float_t a, float_t x)
 	{
-		float_t s = 0, t = std::pow(x, a)/a;
-		do s += t, t *= x, t /= ++a;
+		float_t s = 0;
+		float_t t = pow(x, a)/a;
+		do {
+		 s += t;
+		 t *= x;
+		 t /= ++a;
+		}
 		while (t);
-		s /= std::exp(x);
+		s /= exp(x);
 		return s;
 	}
 
 	/// The upper incomplete gamma function (lower's complement)
 	template <typename float_t> float_t igammac(float_t a, float_t x)
 	{
-		return std::tgamma(a) - igamma(a, x);
+		return tgamma(a) - igamma(a, x);
 	}
 	
 	/// Extends combinations into the field of real numbers
 	template <typename float_t> float_t beta(float_t a, float_t b)
 	{
-		return std::tgamma(a)*std::tgamma(b)/std::tgamma(a + b);
+		return tgamma(a)*tgamma(b)/tgamma(a + b);
 	}
 	
 	/// The lower incomplete beta function
 	template <typename float_t> float_t ibeta(float_t a, float_t b, float_t x)
 	{
-		float_t n = 1, u = 1 - b;
-		float_t s = 0, t = std::pow(x, a);
-		do s += t/a++, t *= u++, t /= n++, t *= x;
+		float_t n = 1;
+		float_t u = 1 - b;
+		float_t s = 0;
+		float_t t = pow(x, a);
+		do {
+		 s += t/a;
+		 ++a;
+		 t *= u;
+		 ++u;
+		 t /= n;
+		 ++n;
+		 t *= x;
+		}
 		while (t);
 		return s;
 	}
@@ -185,8 +220,13 @@ namespace numeric
 	{
 		bool a = false;
 		uintmax_t n = 1;
-		float_t s = 0, t = 1;
-		do (a = !a) ? s += t : s -= t, t = std::pow(++n, -x);
+		float_t s = 0;
+		float_t t = 1;
+		do {
+		 a = !a;
+		 a ? s += t : s -= t;
+		 t = pow(++n, -x);
+		}
 		while (eps < t);
 		return s;
 	}
@@ -195,8 +235,12 @@ namespace numeric
 	template <typename float_t> float_t zeta(float_t x, float_t eps=1e-9)
 	{
 		uintmax_t n = 1;
-		float_t s = 0, t = 1;
-		do s += t, t = std::pow(++n, -x);
+		float_t s = 0;
+		float_t t = 1;
+		do {
+		 s += t;
+		 t = pow(++n, -x);
+		}
 		while (eps < t);
 		return s;
 	}
@@ -205,11 +249,11 @@ namespace numeric
 	template <typename float_t> float_t zeta_p(float_t x, float_t eps=1e-9)
 	{
 		uintmax_t p = 2, q = 3;
-		float_t t = std::pow(p, -x);
+		float_t t = pow(p, -x);
 		float_t s = 1 - t;
 		do {
-		 if (gcd(p, q) == 1) {
-		  t = std::pow(q, -x);
+		 if (1 == gcd(p, q)) {
+		  t = pow(q, -x);
 		  s *= 1 - t;
 		  p *= q;
 		 }
@@ -223,15 +267,23 @@ namespace numeric
 	template <typename float_t> float_t zeta_e(float_t x, float_t eps=1e-9)
 	{
 		// Better convergence with eta identity
-		return eta(x, eps)/(1 - std::exp2(1 - x));
+		return eta(x, eps)/(1 - exp2(1 - x));
 	}
 
 	/// The Gaussian hypergeometric function
 	template <typename float_t> float_t hyper(float_t a, float_t b, float_t c, float_t x)
 	{
 		uintmax_t n = 1;
-		float_t s = 1, t = x*a*b/c;
-		do s += t, t *= ++a, t /= ++c, t *= ++b, t /= ++n, t *= x;
+		float_t s = 1;
+		float_t t = x*a*b/c;
+		do {
+		 s += t;
+		 t *= ++a;
+		 t /= ++c;
+		 t *= ++b;
+		 t /= ++n;
+		 t *= x;
+		}
 		while (t);
 		return s;
 	}
@@ -240,8 +292,15 @@ namespace numeric
 	template <typename float_t> float_t kummer(float_t a, float_t c, float_t x)
 	{
 		uintmax_t n = 1;
-		float_t s = 1, t = x*a/c;
-		do s += t, t *= ++a, t /= ++c, t *= x, t /= ++n;
+		float_t s = 1;
+		float_t t = x*a/c;
+		do {
+		 s += t;
+		 t *= ++a;
+		 t /= ++c;
+		 t *= x;
+		 t /= ++n;
+		}
 		while (t);
 		return s;
 	}
@@ -249,8 +308,8 @@ namespace numeric
 	/// Measures the complement of the error function (the tails)
 	template <typename float_t> float_t erfc(float_t x)
 	{
-		constexpr auto isqrtpi = sqrt2/sqrt2pi;
-		return igammac<float_t>(0.5, x*x)*isqrtpi;
+		constexpr auto invsqrtpi = sqrt2/sqrt2pi;
+		return igammac<float_t>(0.5, x*x)*invsqrtpi;
 	}
 
 	/// Measures the area under the bell curve for errors of size x
@@ -263,8 +322,13 @@ namespace numeric
 	template <typename float_t> float_t exp(float_t x)
 	{
 		uintmax_t n = 0;
-		float_t s = 0, t = 1;
-		do s += t, t *= x, t /= ++n;
+		float_t s = 0;
+		float_t t = 1;
+		do {
+		 s += t;
+		 t *= x;
+		 t /= ++n;
+		}
 		while (t);
 		return s;
 	}
@@ -281,8 +345,15 @@ namespace numeric
 		x = (x - 1)/(x + 1);
 		uintmax_t n = 1;
 		const float_t xx = x*x;
-		float_t r = x, s = 0, t = r;
-		do s += t, r *= xx, n += 2, t = r/n;
+		float_t r = x;
+		float_t s = 0;
+		float_t t = r;
+		do {
+		 s += t;
+		 r *= xx;
+		 n += 2;
+		 t = r/n;
+		}
 		while (t);
 		return 2*s;
 	}
@@ -328,8 +399,14 @@ namespace numeric
 	{
 		uintmax_t n = 1;
 		const float_t xx = -x*x;
-		float_t s = 0, t = x;
-		do s += t, t *= xx, t /= ++n, t /= ++n;
+		float_t s = 0;
+		float_t t = x;
+		do {
+		 s += t;
+		 t *= xx;
+		 t /= ++n;
+		 t /= ++n;
+		}
 		while (t);
 		return s;
 	}
@@ -339,8 +416,14 @@ namespace numeric
 	{
 		uintmax_t n = 0;
 		const float_t xx = -x*x;
-		float_t s = 0, t = 1;
-		do s += t, t *= xx, t /= ++n, t /= ++n;
+		float_t s = 0;
+		float_t t = 1;
+		do {
+		 s += t;
+		 t *= xx;
+		 t /= ++n;
+		 t /= ++n;
+		}
 		while (t);
 		return s;
 	}
@@ -384,8 +467,14 @@ namespace numeric
 	{
 		uintmax_t n = 1;
 		const float_t xx = x*x;
-		float_t s = 0, t = x;
-		do s += t, t *= xx, t /= ++n, t /= ++n;
+		float_t s = 0;
+		float_t t = x;
+		do {
+		 s += t;
+		 t *= xx;
+		 t /= ++n;
+		 t /= ++n;
+		}
 		while (t);
 		return s;
 	}
@@ -395,8 +484,14 @@ namespace numeric
 	{
 		uintmax_t n = 0;
 		const float_t xx = x*x;
-		float_t s = 0, t = 1;
-		do s += t, t *= xx, t /= ++n, t /= ++n;
+		float_t s = 0;
+		float_t t = 1;
+		do {
+		 s += t;
+		 t *= xx;
+		 t /= ++n;
+		 t /= ++n;
+		}
 		while (t);
 		return s;
 	}
@@ -425,7 +520,7 @@ namespace numeric
 		return x*hyper<float_t>(0.5, 1.0, 1.5, x*x);
 	}
 	
-}; // namespace maths
+}; // namespace numeric
 
-#endif // Metric_maths
+#endif // Metric_numeric
 	
