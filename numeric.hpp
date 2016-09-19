@@ -35,8 +35,6 @@
 #include <utility>
 #include <cmath>
 
-#include "logic.hpp"
-
 namespace numeric
 {
 	// These are not always defined in cmath nor with 128 bit precision
@@ -155,24 +153,100 @@ namespace numeric
 		}
 		return m/r;
 	}
+
+	/// Euler's number raised to the exponent x
+	template <typename num_t> num_t exp(num_t x)
+	{
+		uintmax_t n = 0;
+		num_t s = 0;
+		num_t t = 1;
+		do {
+		 s += t;
+		 t *= x;
+		 t /= ++n;
+		}
+		while (t);
+		return s;
+	}
+
+	/// The number 2 raised to the exponent x
+	template <typename num_t> num_t exp2(num_t x)
+	{
+		return exp(x*ln2);
+	}
+
+	/// The natural logarithm of x, so exp(ln(x)) = x
+	template <typename num_t> num_t ln(num_t x)
+	{
+		x = (x - 1)/(x + 1);
+		uintmax_t n = 1;
+		const num_t xx = x*x;
+		num_t r = x;
+		num_t s = 0;
+		num_t t = r;
+		do {
+		 s += t;
+		 r *= xx;
+		 n += 2;
+		 t = r/n;
+		}
+		while (t);
+		return 2*s;
+	}
+
+	/// The logarithm of x expressed in base b, so pow(b, log(x, b)) = x
+	template <typename num_t> num_t log(num_t x, num_t b)
+	{
+		return ln(x)/ln(b);
+	}
+
+	/// The logarithm of x expressed in base 2, so log2(x) = ln(x)/ln2
+	template <typename num_t> num_t log2(num_t x)
+	{
+		return ln(x)/ln2;
+	}
+
+	/// The logarithm of x expressed in base 10, so log10(x) = ln(x)/ln10
+	template <typename num_t> num_t log10(num_t x)
+	{
+		return ln(x)/ln10;
+	}	
+	
+	/// The power of x raised to the exponent p
+	template <typename num_t> num_t pow(num_t x, num_t p)
+	{
+		return exp(ln(x)*p);
+	}
+
+	/// The square root of x for real x >= 0
+	template <typename num_t> num_t sqrt(num_t x)
+	{
+		return exp(ln(x)/2);
+	}
+
+	/// The cube root of x for real x
+	template <typename num_t> num_t cbrt(num_t x)
+	{
+		return exp(ln(x)/3);
+	}
 	
 	/// Extends factorials into the real numbers, tgamma(n) = (n - 1)!
-	template <typename float_t> float_t tgamma(float_t x)
+	template <typename num_t> num_t tgamma(num_t x)
 	{
 		return std::tgamma(x);
 	}
 
 	/// The natural logarithm of the gamma function
-	template <typename float_t> float_t lgamma(float_t x)
+	template <typename num_t> num_t lgamma(num_t x)
 	{
 		return std::lgamma(x);
 	}
 
 	/// The lower incomplete gamma function
-	template <typename float_t> float_t igamma(float_t a, float_t x)
+	template <typename num_t> num_t igamma(num_t a, num_t x)
 	{
-		float_t s = 0;
-		float_t t = pow(x, a)/a;
+		num_t s = 0;
+		num_t t = pow(x, a)/a;
 		do {
 		 s += t;
 		 t *= x;
@@ -184,24 +258,24 @@ namespace numeric
 	}
 
 	/// The upper incomplete gamma function (lower's complement)
-	template <typename float_t> float_t igammac(float_t a, float_t x)
+	template <typename num_t> num_t igammac(num_t a, num_t x)
 	{
 		return tgamma(a) - igamma(a, x);
 	}
 	
 	/// Extends combinations into the field of real numbers
-	template <typename float_t> float_t beta(float_t a, float_t b)
+	template <typename num_t> num_t beta(num_t a, num_t b)
 	{
 		return tgamma(a)*tgamma(b)/tgamma(a + b);
 	}
 	
 	/// The lower incomplete beta function
-	template <typename float_t> float_t ibeta(float_t a, float_t b, float_t x)
+	template <typename num_t> num_t ibeta(num_t a, num_t b, num_t x)
 	{
-		float_t n = 1;
-		float_t u = 1 - b;
-		float_t s = 0;
-		float_t t = pow(x, a);
+		num_t n = 1;
+		num_t u = 1 - b;
+		num_t s = 0;
+		num_t t = pow(x, a);
 		do {
 		 s += t/a;
 		 ++a;
@@ -216,50 +290,50 @@ namespace numeric
 	}
 
 	/// The upper incomplete beta function (lower's complement)
-	template <typename float_t> float_t ibetac(float_t a, float_t b, float_t x)
+	template <typename num_t> num_t ibetac(num_t a, num_t b, num_t x)
 	{
 		return beta(a, b) - ibeta(a, b, x);
 	}
 
 	/// The Dirichlet eta function for real x > 0
-	template <typename float_t> float_t eta(float_t x, float_t eps=1e-9)
+	template <typename num_t> num_t eta(num_t x, num_t eps=1e-9)
 	{
 		bool a = false;
 		uintmax_t n = 1;
-		float_t s = 0;
-		float_t t = 1;
+		num_t s = 0;
+		num_t t = 1;
 		do {
 		 a = !a;
 		 a ? s += t : s -= t;
-		 t = pow(++n, -x);
+		 t = pow<num_t>(++n, -x);
 		}
 		while (eps < t);
 		return s;
 	}
 
 	/// The Reimann zeta function for real x > 1, defined as a discrete sum
-	template <typename float_t> float_t zeta(float_t x, float_t eps=1e-9)
+	template <typename num_t> num_t zeta(num_t x, num_t eps=1e-9)
 	{
 		uintmax_t n = 1;
-		float_t s = 0;
-		float_t t = 1;
+		num_t s = 0;
+		num_t t = 1;
 		do {
 		 s += t;
-		 t = pow(++n, -x);
+		 t = pow<num_t>(++n, -x);
 		}
 		while (eps < t);
 		return s;
 	}
 
 	/// The Reimann zeta function for real x > 1, using Euler's product
-	template <typename float_t> float_t zeta_p(float_t x, float_t eps=1e-9)
+	template <typename num_t> num_t zeta_p(num_t x, num_t eps=1e-9)
 	{
 		uintmax_t p = 2, q = 3;
-		float_t t = pow(p, -x);
-		float_t s = 1 - t;
+		num_t t = pow<num_t>(p, -x);
+		num_t s = 1 - t;
 		do {
 		 if (coprime(p, q)) {
-		  t = pow(q, -x);
+		  t = pow<num_t>(q, -x);
 		  s *= 1 - t;
 		  p *= q;
 		 }
@@ -270,18 +344,18 @@ namespace numeric
 	}
 
 	/// The Reimann zeta function for real x > 1, Dirichlet's eta identity
-	template <typename float_t> float_t zeta_e(float_t x, float_t eps=1e-9)
+	template <typename num_t> num_t zeta_e(num_t x, num_t eps=1e-9)
 	{
 		// Better convergence with eta identity
 		return eta(x, eps)/(1 - exp2(1 - x));
 	}
 
 	/// The Gaussian hypergeometric function
-	template <typename float_t> float_t hyper(float_t a, float_t b, float_t c, float_t x)
+	template <typename num_t> num_t hyper(num_t a, num_t b, num_t c, num_t x)
 	{
 		uintmax_t n = 1;
-		float_t s = 1;
-		float_t t = x*a*b/c;
+		num_t s = 1;
+		num_t t = x*a*b/c;
 		do {
 		 s += t;
 		 t *= ++a;
@@ -295,11 +369,11 @@ namespace numeric
 	}
 
 	/// Kummer's confluent hypergeometric function
-	template <typename float_t> float_t kummer(float_t a, float_t c, float_t x)
+	template <typename num_t> num_t kummer(num_t a, num_t c, num_t x)
 	{
 		uintmax_t n = 1;
-		float_t s = 1;
-		float_t t = x*a/c;
+		num_t s = 1;
+		num_t t = x*a/c;
 		do {
 		 s += t;
 		 t *= ++a;
@@ -312,101 +386,25 @@ namespace numeric
 	}
 
 	/// Measures the complement of the error function (the tails)
-	template <typename float_t> float_t erfc(float_t x)
+	template <typename num_t> num_t erfc(num_t x)
 	{
 		constexpr auto isqrtpi = sqrt2/sqrt2pi;
-		return igammac<float_t>(0.5, x*x)*isqrtpi;
+		return igammac<num_t>(0.5, x*x)*isqrtpi;
 	}
 
 	/// Measures the area under the bell curve for errors of size x
-	template <typename float_t> float_t erf(float_t x)
+	template <typename num_t> num_t erf(num_t x)
 	{
 		return 1.0 - erfc(x);
 	}
 
-	/// Euler's number raised to the exponent x
-	template <typename float_t> float_t exp(float_t x)
-	{
-		uintmax_t n = 0;
-		float_t s = 0;
-		float_t t = 1;
-		do {
-		 s += t;
-		 t *= x;
-		 t /= ++n;
-		}
-		while (t);
-		return s;
-	}
-
-	/// The number 2 raised to the exponent x
-	template <typename float_t> float_t exp2(float_t x)
-	{
-		return exp(x*ln2);
-	}
-
-	/// The natural logarithm of x, so exp(ln(x)) = x
-	template <typename float_t> float_t ln(float_t x)
-	{
-		x = (x - 1)/(x + 1);
-		uintmax_t n = 1;
-		const float_t xx = x*x;
-		float_t r = x;
-		float_t s = 0;
-		float_t t = r;
-		do {
-		 s += t;
-		 r *= xx;
-		 n += 2;
-		 t = r/n;
-		}
-		while (t);
-		return 2*s;
-	}
-
-	/// The logarithm of x expressed in base b, so pow(b, log(x, b)) = x
-	template <typename float_t> float_t log(float_t x, float_t b)
-	{
-		return ln(x)/ln(b);
-	}
-
-	/// The logarithm of x expressed in base 2, so log2(x) = ln(x)/ln2
-	template <typename float_t> float_t log2(float_t x)
-	{
-		return ln(x)/ln2;
-	}
-
-	/// The logarithm of x expressed in base 10, so log10(x) = ln(x)/ln10
-	template <typename float_t> float_t log10(float_t x)
-	{
-		return ln(x)/ln10;
-	}	
-	
-	/// The power of x raised to the exponent p
-	template <typename float_t> float_t pow(float_t x, float_t p)
-	{
-		return exp(ln(x)*p);
-	}
-
-	/// The square root of x for real x >= 0
-	template <typename float_t> float_t sqrt(float_t x)
-	{
-		return exp(ln(x)/2);
-	}
-
-	/// The cube root of x for real x
-	template <typename float_t> float_t cbrt(float_t x)
-	{
-		return exp(ln(x)/3);
-	}
-
 	/// In a right triangle, the leg opposite an angle over the hypotenuse
-	template <typename float_t> float_t sin(float_t x)
+	template <typename num_t> num_t sin(num_t x)
 	{
 		uintmax_t n = 1;
-		const float_t xx = -x*x;
-		float_t s = 0;
-		float_t t = x;
+		const num_t xx = -x*x;
+		num_t s = 0;
+		num_t t = x;
 		do {
 		 s += t;
 		 t *= xx;
@@ -418,12 +416,12 @@ namespace numeric
 	}
 
 	/// In a right triangle, the leg adjacent an angle over the hypotenuse
-	template <typename float_t> float_t cos(float_t x)
+	template <typename num_t> num_t cos(num_t x)
 	{
 		uintmax_t n = 0;
-		const float_t xx = -x*x;
-		float_t s = 0;
-		float_t t = 1;
+		const num_t xx = -x*x;
+		num_t s = 0;
+		num_t t = 1;
 		do {
 		 s += t;
 		 t *= xx;
@@ -435,33 +433,33 @@ namespace numeric
 	}
 
 	/// Slope of tangent line on a circle at angle x from the origin
-	template <typename float_t> float_t tan(float_t x)
+	template <typename num_t> num_t tan(num_t x)
 	{
 		return sin(x)/cos(x);
 	}
 
 	/// Arcsine returns the angle of a given sine
-	template <typename float_t> float_t asin(float_t x)
+	template <typename num_t> num_t asin(num_t x)
 	{
-		const float_t a = 0.5, b = 0.5, c = 1.5;
+		const num_t a = 0.5, b = 0.5, c = 1.5;
 		return x*hyper(a, b, c, x*x);
 	}
 
 	/// Arccosine returns the angle of a given cosine
-	template <typename float_t> float_t acos(float_t x)
+	template <typename num_t> num_t acos(num_t x)
 	{
 		return pi_2 - asin(x);
 	}
 
 	/// Arctangent returns the angle of a given tangent
-	template <typename float_t> float_t atan(float_t x)
+	template <typename num_t> num_t atan(num_t x)
 	{
-		const float_t a = 0.5, b = 1.0, c = 1.5;
+		const num_t a = 0.5, b = 1.0, c = 1.5;
 		return x*hyper(a, b, c, -x*x);
 	}
 
 	/// Deduces the quadrant correct angle of a given sine and cosine
-	template <typename float_t> float_t atan2(float_t y, float_t x)
+	template <typename num_t> num_t atan2(num_t y, num_t x)
 	{
 		if (x > 0) return atan(y/x);
 		if (x < 0) return atan(y/x) + (y < 0 ? -pi : +pi);
@@ -471,12 +469,12 @@ namespace numeric
 	}
 
 	/// Rise of the point on an equilateral hyperbola at half of angle x
-	template <typename float_t> float_t sinh(float_t x)
+	template <typename num_t> num_t sinh(num_t x)
 	{
 		uintmax_t n = 1;
-		const float_t xx = x*x;
-		float_t s = 0;
-		float_t t = x;
+		const num_t xx = x*x;
+		num_t s = 0;
+		num_t t = x;
 		do {
 		 s += t;
 		 t *= xx;
@@ -488,12 +486,12 @@ namespace numeric
 	}
 
 	/// Run of the point on equilateral hyperbola at half of angle x
-	template <typename float_t> float_t cosh(float_t x)
+	template <typename num_t> num_t cosh(num_t x)
 	{
 		uintmax_t n = 0;
-		const float_t xx = x*x;
-		float_t s = 0;
-		float_t t = 1;
+		const num_t xx = x*x;
+		num_t s = 0;
+		num_t t = 1;
 		do {
 		 s += t;
 		 t *= xx;
@@ -505,27 +503,27 @@ namespace numeric
 	}
 
 	/// Slope of a line meeting a hyperbola at half of angle x from origin
-	template <typename float_t> float_t tanh(float_t x)
+	template <typename num_t> num_t tanh(num_t x)
 	{
 		return sinh(x)/cosh(x);
 	}
 
 	/// The angle with a hyperbolic sine of x
-	template <typename float_t> float_t asinh(float_t x)
+	template <typename num_t> num_t asinh(num_t x)
 	{
 		return ln(x + sqrt(x*x + 1));
 	}
 
 	/// The angle with a hyperbolic cosine of x
-	template <typename float_t> float_t acosh(float_t x)
+	template <typename num_t> num_t acosh(num_t x)
 	{
 		return ln(x + sqrt(x*x - 1));
 	}
 
 	/// The angle with a hyperbolic tangent of x
-	template <typename float_t> float_t atanh(float_t x)
+	template <typename num_t> num_t atanh(num_t x)
 	{
-		const float_t a = 0.5, b = 1.0, c = 1.5;
+		const num_t a = 0.5, b = 1.0, c = 1.5;
 		return x*hyper(a, b, c, x*x);
 	}
 	

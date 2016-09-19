@@ -282,6 +282,181 @@ namespace arithmetic
 		}
 	};
 
+
+	template <> class integer<0>
+	{
+		using base = uint8_t;
+		using int_t = intmax_t;
+		using uint_t = uintmax_t;
+		using storage = std::vector<base>;
+		using overflow = std::overflow_error;
+		using underflow = std::underflow_error;
+		static constexpr auto divide = std::imaxdiv;
+		static const uint_t max = std::numeric_limits<base>::max();
+		static const uint_t mod = max + 1;
+
+		storage digits;
+
+	public:
+
+		integer operator++()
+		{
+			for (base & digit : digits) {
+				if (digit < max) {
+					++digit;
+					return *this;
+				}
+			}
+			digits.push_back(1);
+			return *this;
+		}
+
+		integer operator--()
+		{
+			for (base & digit : digits) {
+				if (0 < digit) {
+					--digit;
+					return *this;
+				}
+			}
+			throw underflow("--"); // todo
+		}
+
+		integer operator~()
+		{
+			size_t size = digits.size();
+			integer arg;
+			arg.digits.resize(size);
+			for (size_t i = 0; i < size; ++i) {
+				arg.digits[i] = ~digits[i];
+			}
+			return arg;
+		}
+
+		bool operator==(const integer &arg)
+		{
+			return digits == arg.digits;
+		}
+
+		bool operator<(const integer &arg)
+		{
+			size_t this_size = digits.size();
+			size_t that_size = arg.digits.size();
+			if (this_size < that_size) return true;
+			if (that_size < this_size) return false;
+			auto a = algorithm::reversed(digits);
+			auto b = algorithm::reversed(arg.digits);
+			return algorithm::lexicographical_compare(a, b);
+		}
+
+		bool operator!(void)
+		{
+			auto zero = [](base digit){ return !digit; };
+			return algorithm::all_of(digits, zero);
+		}
+
+		integer operator=(const std::string &arg)
+		{
+			digits.clear();
+			for (char code : arg) {
+				uint_t carry = code - '0';
+				for (base & digit : digits) {
+					carry += digit * 10;
+					if (max < carry) {
+						auto div = divide(carry, mod);
+						digit = div.rem;
+						carry = div.quot;
+					} else {
+						digit = carry;
+						carry = 0;
+					}
+				}
+				if (carry) {
+					digits.push_back(carry);
+				}
+			}
+			return *this;
+		}
+
+		integer operator=(uint_t arg)
+		{
+			digits.clear();
+			uint_t carry = arg;
+			do {
+				auto div = divide(carry, mod);
+				digits.push_back(div.rem);
+				carry = div.quot;
+			}
+			while (carry);
+			return *this;
+		}
+
+		operator std::string() const
+		{
+			std::string string;
+			storage array = digits;
+			auto reversed = algorithm::reversed(array);
+			bool zero;
+			do {
+				zero = true;
+				uint_t carry = 0;
+				for (base & digit : reversed) {
+					carry *= mod;
+					carry += digit;
+					auto div = divide(carry, 10);
+					digit = div.quot;
+					carry = div.rem;
+					if (digit) {
+						zero = false;
+					}
+				}
+				string += char(carry + '0');
+			}
+			while (!zero);
+			algorithm::reverse(string);
+			return string;
+		}
+
+		operator uint_t() const
+		{
+			uint_t carry = 0;
+			for (base digit : algorithm::reversed(digits)) {
+				uint_t check = carry * mod + digit;
+				if (check < carry) {
+					throw overflow("int=");
+				}
+				carry = check;
+			}
+			return carry;
+		}
+
+		integer()
+		{
+			digits.push_back(0);
+		}
+
+		integer(uint_t arg)
+		{
+			operator=(arg);
+		}
+
+		integer(const std::string &arg)
+		{
+			operator=(arg);
+		}
+
+		template <size_t size> integer(const integer<size> &arg)
+		{
+			digits.resize(arg.digits.size());
+			algorithm::copy(arg.digits, digits);
+		}
+
+		void swap(integer &arg)
+		{
+			digits.swap(arg.digits);
+		}
+	};
+
 }; // namespace arithmetic
 
 #endif // Metric_integer

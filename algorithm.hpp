@@ -57,6 +57,12 @@ namespace algorithm
 		return std::for_each(begin(c), end(c), unary);
 	}
 
+	template <typename from_container, typename to_container>
+	inline auto copy(const from_container &from, const to_container &to)
+	{
+		return std::copy(begin(from), end(from), begin(to));
+	}
+
 	template <typename container, typename type>
 	inline auto count(const container &c, const type &value)
 	{
