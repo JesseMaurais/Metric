@@ -81,7 +81,7 @@ namespace arithmetic
 						carry = 0;
 					}
 				}
-				if (carry) {
+				if (sums[size + i] or carry) {
 					throw overflow("*");
 				}
 			}
