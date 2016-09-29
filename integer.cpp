@@ -133,6 +133,6 @@ template <size_t size> struct integer
 
 extern "C" int luaopen_integer(lua_State *state)
 {
-	return integer<8>::open(state);
+	return integer<0>::open(state);
 }
 

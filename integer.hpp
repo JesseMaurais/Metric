@@ -67,8 +67,8 @@ namespace arithmetic
 
 		integer operator*=(const integer &arg)
 		{
-			uint_t carry = 0;
 			uint_t sums[size*2] = {0};
+			uint_t carry = 0;
 			for (size_t i = 0; i < size; ++i) {
 				for (size_t j = 0; j < size; ++j) {
 					carry += digits[i] * arg.digits[j];
@@ -84,8 +84,20 @@ namespace arithmetic
 				if (carry) {
 					throw overflow("*");
 				}
-				digits[i] = sums[i];
-				carry = 0;
+			}
+			for (size_t i = 0; i < size; ++i) {
+				carry += sums[i];
+				if (max < carry) {
+					auto div = divide(carry, mod);
+					digits[i] = div.rem;
+					carry = div.quot;
+				} else {
+					digits[i] = carry;
+					carry = 0;
+				}
+			}
+			if (carry) {
+				throw overflow("*");
 			}
 			return *this;
 		}
@@ -131,39 +143,6 @@ namespace arithmetic
 				digit = max;
 			}
 			throw underflow("--");
-		}
-
-		integer operator&=(const integer &arg)
-		{
-			for (size_t i = 0; i < size; ++i) {
-				digits[i] &= arg.digits[i];
-			}
-			return *this;
-		}
-
-		integer operator|=(const integer &arg)
-		{
-			for (size_t i = 0; i < size; ++i) {
-				digits[i] |= arg.digits[i];
-			}
-			return *this;
-		}
-
-		integer operator^=(const integer &arg)
-		{
-			for (size_t i = 0; i < size; ++i) {
-				digits[i] ^= arg.digits[i];
-			}
-			return *this;
-		}
-
-		integer operator~()
-		{
-			integer arg;
-			for (size_t i = 0; i < size; ++i) {
-				arg.digits[i] = ~digits[i];
-			}
-			return arg;
 		}
 
 		bool operator==(const integer &arg)
@@ -299,6 +278,141 @@ namespace arithmetic
 
 	public:
 
+		integer operator+=(const integer &arg)
+		{
+			const size_t digit_size = digits.size();
+			const size_t arg_size = arg.digits.size();
+			const size_t size = std::min(digit_size, arg_size);
+			uint_t carry = 0;
+			for (size_t i = 0; i < size; ++i) {
+				carry += digits[i] + arg.digits[i];
+				if (max < carry) {
+					auto div = divide(carry, mod);
+					digits[i] = div.rem;
+					carry = div.quot;	
+				} else {
+					digits[i] = carry;
+					carry = 0;
+				}
+			}
+			for (size_t i = size; i < digit_size; ++i) {
+				carry += digits[i];
+				if (max < carry) {
+					auto div = divide(carry, mod);
+					digits[i] = div.rem;
+					carry = div.quot;
+				} else {
+					digits[i] = carry;
+					carry = 0;
+					break;
+				}
+			}
+			for (size_t i = size; i < arg_size; ++i) {
+				carry += arg.digits[i];
+				if (max < carry) {
+					auto div = divide(carry, mod);
+					digits.push_back(div.rem);
+					carry = div.quot;
+				}
+			}
+			while (carry) {
+				auto div = divide(carry, mod);
+				digits.push_back(div.rem);
+				carry = div.quot;
+			}
+			return *this;
+		}
+
+		integer operator-=(const integer &arg)
+		{
+			const size_t digit_size = digits.size();
+			const size_t arg_size = arg.digits.size();
+			const size_t size = std::min(digit_size, arg_size);
+			uint_t carry = 0;
+			for (size_t i = 0; i < size; ++i) {
+				int_t diff = digits[i] - arg.digits[i] - carry;
+				for (carry = 0; diff < 0; ++carry) {
+					diff += mod;
+				}
+				digits[i] = diff;
+			}
+			for (size_t i = size; i < digit_size; ++i) {
+				int_t diff = digits[i] - carry;
+				for (carry = 0; diff < 0; ++carry) {
+					diff += mod;
+				}
+				digits[i] = diff;
+			}
+			if (carry) {
+				throw underflow("-");
+			}
+			return *this;
+		}
+
+		integer operator*=(const integer &arg)
+		{
+			const size_t digit_size = digits.size();
+			const size_t arg_size = arg.digits.size();
+			const size_t size = digit_size + arg_size;
+			uint_t sums[size] = {0};
+			uint_t carry = 0;
+			for (size_t i = 0; i < digit_size; ++i) {
+				for (size_t j = 0; j < arg_size; ++j) {
+					carry += digits[i] * arg.digits[j];
+					if (max < carry) {
+						auto div = divide(carry, mod);
+						sums[i+j] += div.rem;
+						carry = div.quot;
+					} else {
+						sums[i+j] += carry;
+						carry = 0;
+					}
+				}
+				sums[arg_size + i] += carry;
+				carry = 0;
+			}
+			digits.clear();
+			for (size_t k = 0; k < size; ++k) {
+				carry += sums[k];
+				if (max < carry) {
+					auto div = divide(carry, mod);
+					digits.push_back(div.rem);
+					carry = div.quot;
+				} else {
+					digits.push_back(carry);
+					carry = 0;
+				}
+			}
+			while (carry) {
+				auto div = divide(carry, mod);
+				digits.push_back(div.rem);
+				carry = div.quot;
+			}
+			while (digits.back() == 0) {
+				digits.pop_back();
+			}
+			return *this;
+		}
+
+		integer operator/=(const integer &arg)
+		{
+			integer quot;
+			while (!operator<(arg)) {
+				operator-=(arg);
+				++quot;
+			}
+			swap(quot);
+			return *this;
+		}
+
+		integer operator%=(const integer &arg)
+		{
+			while (!operator<(arg)) {
+				operator-=(arg);
+			}
+			return *this;
+		}
+
 		integer operator++()
 		{
 			for (base & digit : digits) {
@@ -394,8 +508,8 @@ namespace arithmetic
 		operator std::string() const
 		{
 			std::string string;
-			storage array = digits;
-			auto reversed = algorithm::reversed(array);
+			storage copy = digits;
+			auto reversed = algorithm::reversed(copy);
 			bool zero;
 			do {
 				zero = true;
