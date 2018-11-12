@@ -1,5 +1,5 @@
-#ifndef Metric_arithmetic
-#define Metric_arithmetic
+#ifndef arithmetic_hpp
+#define arithmetic_hpp
 
 /**
  * This file defines global operator overloads which reduce common arithmetic
@@ -87,7 +87,7 @@ namespace arithmetic
 		}
 	};
 
-}; // namespace arithmetic
+}; // namespace
 
-#endif // Metric_arithmetic
+#endif // file
 

@@ -1,5 +1,5 @@
-#ifndef Metric_algorithm
-#define Metric_algorithm
+#ifndef algorithm_hpp
+#define algorithm_hpp
 
 #include <numeric>
 #include <algorithm>
@@ -94,7 +94,7 @@ namespace algorithm
 		                                    begin(b), end(b));
 	}
 
-}; // namespace algorithm
+}; // namespace
 
-#endif // Metric_algorithm
+#endif // file
 

@@ -1,5 +1,5 @@
-#ifndef Metric_stats
-#define Metric_stats
+#ifndef statistics_hpp
+#define statistics_hpp
 
 /**
  * This is an R-like interface for calculating probabilities and densities/mass
@@ -90,7 +90,7 @@ namespace statistics
 		return 1 - pbeta(num/(den + num*x), den/2, num/2);
 	}
 
-}; // namespace statistics
+}; // namespace 
 
-#endif // Metric_statistics
+#endif // file
 

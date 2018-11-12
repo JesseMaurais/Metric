@@ -1,5 +1,5 @@
-#ifndef Metric_numeric
-#define Metric_numeric
+#ifndef numeric_hpp
+#define numeric_hpp
 
 /**
  * The mathematical functions found in the C++ standard header, cmath, are
@@ -527,7 +527,7 @@ namespace numeric
 		return x*hyper(a, b, c, x*x);
 	}
 	
-}; // namespace numeric
+}; // namespace
 
-#endif // Metric_numeric
+#endif // file
 	

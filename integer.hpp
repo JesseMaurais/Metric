@@ -1,5 +1,5 @@
-#ifndef Metric_integer
-#define Metric_integer
+#ifndef integer_hpp
+#define integer_hpp
 
 #include <cinttypes>
 #include <cstdint>
@@ -571,7 +571,7 @@ namespace arithmetic
 		}
 	};
 
-}; // namespace arithmetic
+}; // namespace
 
-#endif // Metric_integer
+#endif // file
 
